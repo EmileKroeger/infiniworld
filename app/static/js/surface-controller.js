@@ -1,5 +1,8 @@
 angular.module('infiniworld')
   .service("sField", function() {
+    var zDistrib = gaussian(0, 1);
+    //var sample = zDistrib.ppf(Math.random());
+    //console.log(sample);
     var seed = 1;
     function random() {
         var x = Math.sin(seed++) * 10000;
@@ -8,25 +11,6 @@ angular.module('infiniworld')
     function seedrand(_seed) {
       var x = Math.sin(_seed) * 10000;
       return x - Math.floor(x);
-    }
-    function renormalize2(value) {
-      if (value <= 0.5) {
-        return 2 * (value * value);
-      } else {
-        return 1 - 2 * (1 - value) * (1 - value);
-      }
-    }
-    function renormalize(value, n) {
-      // value is the sum of n normal variables
-      // wrong:
-      normalized = value/n;
-      //return normalized;
-      while (n > 1) { // incorrect too
-      //if (n > 1) {
-        normalized = renormalize2(normalized);
-        n = n / 2;
-      }
-      return normalized;
     }
   	this.simpleMap = function(seed) {
   		return function(x, y) {
@@ -38,10 +22,12 @@ angular.module('infiniworld')
         var sum = 0;
         for (dx=0; dx < delta; dx++) {
           for (dy=0; dy < delta; dy++) {
-            sum += submap(x+dx, y+dy);
+            sum += zDistrib.ppf(submap(x+dx, y+dy));
           }
         }
-  		  return renormalize(sum, delta * delta);
+        // now "sum" is sampled from distrib of mean 0
+        // and variance delta * delta
+  		  return zDistrib.cdf(sum / Math.sqrt(delta * delta));
   		};
     }
   	return this;
@@ -56,10 +42,6 @@ angular.module('infiniworld')
       b = c255(b);
       return "rgb(" + r + ", " + g + ", " + b +")"
     }
-    //var distribution = gaussian(0, 1);
-    // Take a random sample using inverse transform sampling method.
-    //var sample = distribution.ppf(Math.random());
-    //console.log(sample);
     function blend(c1, c2, advance) {
       
     }
@@ -100,7 +82,6 @@ angular.module('infiniworld')
         humidity: '=humidity',
       },
       controller: controller,
-      // I could have several functions here!
       templateUrl: 'templates/surfacecell.html',
     };
   }) 
@@ -117,13 +98,12 @@ angular.module('infiniworld')
   	$scope.map = sField.simpleMap($scope.rows, $scope.cols);
     // Eventually: make these correlated
   	var altitude0 = sField.simpleMap(1);
-  	$scope.altitude = sField.neighbourMap(altitude0, 2);
+  	$scope.altitude = sField.neighbourMap(altitude0, 4);
   	$scope.population = sField.simpleMap(57);
   	var temperature0 = sField.simpleMap(99);
   	$scope.temperature = sField.neighbourMap(temperature0, 2);
   	var humidity0 = sField.simpleMap(77);
-  	$scope.humidity = sField.neighbourMap(humidity0, 2);
-    //$scope.getCell(x)
+  	$scope.humidity = sField.neighbourMap(humidity0, 4);
     
     function evaluateDistrib(func) {
       var values = {};
@@ -142,5 +122,4 @@ angular.module('infiniworld')
       }
     }
     //evaluateDistrib($scope.humidity);
-
   }]);
