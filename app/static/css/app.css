@@ -10,14 +10,14 @@ body {
 }
 
 .surfacecell {
-  width: 20px;
-  height: 20px;
   padding: 0;
   margin: 0;
   border: 0;
-  text-align: center;
+  width: 20px;
+  height: 20px;
+  font-size: 17px;
   font-family: Symbola;
-  
+  text-align: center;
 }
 
 .sea {
