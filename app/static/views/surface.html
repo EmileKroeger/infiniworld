@@ -1,13 +1,28 @@
 <div class="container-fluid">
-  <div ng-repeat="row in range(0, 15)" class="row">
+  
+
+  <!--
+  <div style="font-family: Symbola">ℜℝ℟℠</div>
+  <div class="navarrow">ℛ ℞ ℡ ™</div>
+  -->
+    
+  
+  <div ng-repeat="y in range(y0, y0 + 15)" class="row">
     <div infiniworld-cell
-      ng-repeat="col in range(0, 30)"
+      ng-repeat="x in range(x0, x0 + 30)"
       class="col-xs-1 surfacecell"
-      altitude="altitude(row, col)"
-      population="population(row, col)"
-      temperature="temperature(row, col)"
-      humidity="humidity(row, col)"
+      altitude="altitude(x, y)"
+      population="population(x, y)"
+      temperature="temperature(x, y)"
+      humidity="humidity(x, y)"
       >
+    </div>
+    <div 
+      ng-repeat="arrow in navarrows[$index]"
+      ng-click="moveMap(arrow.dx, arrow.dy);"
+      class="navarrow col-xs-1"
+      >
+      {{arrow.chr}}
     </div>
   </div>
 </div>

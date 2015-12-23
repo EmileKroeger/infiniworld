@@ -58,6 +58,7 @@ angular.module('infiniworld')
     var GREEN = [0, 1, 0];
     var YELLOW = [1, 1, 0];
     var GREY = [0.7, 0.7, 0.7];
+    var BROWN = [0.5, 0.4, 0.0]
     
     var controller = function($scope) {
       var biome;
@@ -77,19 +78,26 @@ angular.module('infiniworld')
           var blended = blendrgb(lowcolor, GREY, advance);
           style["background-color"] = blended;
         } else {
-          if ($scope.humidity >= 0.5) {
+          var blended = blendrgb(YELLOW, GREEN, $scope.humidity);
+          style["background-color"] = blended;
+          if (($scope.humidity >= 0.8) && ($scope.altitude < 0.7)) {
+            biome = "swamp";
+            glyph = "⅋"; // deciduous
+            var yellowgreen = blend(YELLOW, GREEN, 0.8);
+            var swampiness = 5 * ($scope.humidity - 0.8)
+            var blended = blendrgb(yellowgreen, BROWN, swampiness);
+            style["background-color"] = blended;
+          } else if ($scope.humidity >= 0.5) {
             biome = "forest";
             if ($scope.altitude > 0.7) {
               glyph = "⅊"; //coniferous🌲
             } else {
-              glyph = "⅋" // deciduous
+              glyph = "⅋"; // deciduous
             }
           } else {
             biome = "plains";
             glyph = "::";
           }
-          var blended = blendrgb(YELLOW, GREEN, $scope.humidity);
-          style["background-color"] = blended;
         }
       }
       $scope.biome = biome;
@@ -107,7 +115,11 @@ angular.module('infiniworld')
       templateUrl: 'templates/surfacecell.html',
     };
   }) 
-  .controller('SurfaceController', ['$scope', 'sField', function ($scope, sField) {
+  .controller('SurfaceController', ['$scope', 'sField', '$routeParams',
+  function ($scope, sField, $routeParams) {
+    $scope.x0 = parseInt($routeParams.x);
+    $scope.y0 = parseInt($routeParams.y);
+    console.debug([$scope.x0])
     $scope.range = function(min, max, step) {
         step = step || 1;
         var input = [];
@@ -126,6 +138,30 @@ angular.module('infiniworld')
   	$scope.temperature = sField.neighbourMap(temperature0, 2);
   	var humidity0 = sField.simpleMap(77);
   	$scope.humidity = sField.neighbourMap(humidity0, 4);
+    
+    $scope.moveMap = function(dx, dy) {
+      $scope.x0 += dx;
+      $scope.y0 += dy;
+      $routeParams.x += dx;
+    }
+    $scope.navarrows = [
+      [
+        {chr: 'ℝ', dx: -1, dy: -1},
+        {chr: '℞', dx: 0, dy: -1},
+        {chr: '℟', dx: 1, dy: -1},
+      ], 
+      [
+        {chr: 'ℛ', dx: -1, dy: 0},
+        {chr: '@', dx: 0, dy: 0},
+        {chr: '™', dx: 1, dy: 0},
+      ], 
+      [
+        {chr: 'ℜ', dx: -1, dy: 1},
+        {chr: '℡', dx: 0, dy: 1},
+        {chr: '℠', dx: 1, dy: 1},
+      ], 
+    ];
+    console.debug($scope.navarrows);
     
     function evaluateDistrib(func) {
       var values = {};

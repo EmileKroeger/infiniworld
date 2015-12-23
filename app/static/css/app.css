@@ -9,6 +9,10 @@ body {
     src: url("Symbola.ttf");
 }
 
+.navarrow {
+  font-family: Symbola;
+}
+
 .surfacecell {
   padding: 0;
   margin: 0;
@@ -32,6 +36,11 @@ body {
 
 .forest {
   color: darkgreen;
+  background-color: green;
+}
+
+.swamp {
+  color: darkbrown;
   background-color: green;
 }
 
