@@ -18,30 +18,18 @@ body {
   color: lightblue;
 }
 
-.sea::before {
-  content: '~';
-}
-
 .mountain {
   color: white;
   background-color: grey;
-}
-.mountain::before {
-  content: '◭';
 }
 
 .forest {
   color: darkgreen;
   background-color: green;
-}
-.forest::before {
-  content: '▴▴';
+  font-family: symbola;
 }
 
 .plains {
   color: green;
   background-color: lightyellow;
-}
-.plains::before {
-  content: '::';
 }

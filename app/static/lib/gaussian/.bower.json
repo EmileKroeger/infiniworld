@@ -1,0 +1,29 @@
+{
+  "name": "gaussian",
+  "homepage": "https://github.com/errcw/gaussian",
+  "authors": [
+    "Eric Woroshow <eric@ericw.ca>"
+  ],
+  "description": "A JavaScript model of a Gaussian distribution",
+  "main": "lib/gaussian.js",
+  "keywords": [
+    "gaussian",
+    "normal",
+    "distribution"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/*",
+    "!lib/gaussian.js"
+  ],
+  "_release": "5726de1c95",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "5726de1c95b598beb9398eace67971df5100527f"
+  },
+  "_source": "git://github.com/errcw/gaussian.git",
+  "_target": "*",
+  "_originalSource": "gaussian",
+  "_direct": true
+}
