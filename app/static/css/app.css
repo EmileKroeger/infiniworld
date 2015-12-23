@@ -3,3 +3,45 @@ body {
   padding: 10px;
   background-color: #ECF0F1;
 }
+
+.surfacecell {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  text-align: center;
+}
+
+.sea {
+  background-color: blue;
+  color: lightblue;
+}
+
+.sea::before {
+  content: '~';
+}
+
+.mountain {
+  color: white;
+  background-color: grey;
+}
+.mountain::before {
+  content: '◭';
+}
+
+.forest {
+  color: darkgreen;
+  background-color: green;
+}
+.forest::before {
+  content: '▴▴';
+}
+
+.plains {
+  color: yellow;
+  background-color: lightyellow;
+}
+.plains::before {
+  content: '::';
+}

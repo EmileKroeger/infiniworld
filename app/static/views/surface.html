@@ -1,8 +1,13 @@
 <div class="container-fluid">
-    <div ng-repeat="row in rows" class="row">
-        <div ng-repeat="col in rows"  class="col-xs-1">
-            <div infiniworld-cell cell-data="map[[row, col]]"></div>
-          
-        </div>
+  <div ng-repeat="row in rows" class="row">
+    <div infiniworld-cell
+      ng-repeat="col in rows"
+      class="col-xs-1 surfacecell"
+      cell-data="map[[row, col]]"
+      altitude="altitude[[row, col]]"
+      population="population[[row, col]]"
+      temperature="temperature[[row, col]]"
+      >
     </div>
+  </div>
 </div>
