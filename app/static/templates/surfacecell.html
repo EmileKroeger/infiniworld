@@ -1,14 +1,2 @@
-<div>
-  <div ng-if="altitude < 0.5" class="sea">
-  </div>
-  <div ng-if="(altitude >= 0.5)">
-    <div ng-if="altitude >= 0.8" class="mountain">
-    </div>
-    <div ng-if="(altitude < 0.8)">
-      <div ng-if="temperature >= 0.5" class="forest">
-      </div>
-      <div ng-if="temperature < 0.5" class="plains">
-      </div>
-    </div>
-  </div>
+<div ng-class="biome">
 </div>

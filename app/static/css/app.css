@@ -39,7 +39,7 @@ body {
 }
 
 .plains {
-  color: yellow;
+  color: green;
   background-color: lightyellow;
 }
 .plains::before {
