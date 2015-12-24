@@ -31,22 +31,18 @@ body {
 
 .mountain {
   color: rgb(30%, 30%, 30%);
-  background-color: grey;
 }
 
 .tundra {
   color: green;
-  background-color: white;
 }
 
 .forest {
   color: darkgreen;
-  background-color: green;
 }
 
 .swamp {
   color: darkbrown;
-  background-color: green;
 }
 
 .plains {
