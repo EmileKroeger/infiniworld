@@ -27,7 +27,7 @@ angular.module('infiniworld')
       blended = blend(c1, c2, advance);
       return rgb(blended);
     }
-    var DARKBLUE = [0.0, 0.0, 0.6];
+    var DARKBLUE = [0.0, 0.0, 0.8];
     var BLUE = [0, 0, 0.9];
     var GREEN = [0, 1, 0];
     var YELLOW = [1, 1, 0];
@@ -59,8 +59,8 @@ angular.module('infiniworld')
       if ($scope.altitude < 0.5) {
         biome = "sea";
         glyph = "~";
-        //var blended = blendrgb(DARKBLUE, BLUE, 2*$scope.altitude);
-        //style["background-color"] = rgb(0, 0, 0.7);
+        var waveColor = blendrgb(DARKBLUE, BLUE, 2*$scope.altitude);
+        style["color"] = waveColor;
       } else {
         var vegColor = blend(YELLOW, GREEN, $scope.humidity);
         var altColor = blendAbove(vegColor, GREY, 0.9, $scope.altitude)
@@ -78,8 +78,6 @@ angular.module('infiniworld')
           biome = "tundra";
           glyph = "::";
         } else {
-          var blended = rgb(vegColor);
-          //style["background-color"] = blended;
           if (($scope.humidity >= 0.8) && ($scope.altitude < 0.7)) {
             biome = "swamp";
             if ($scope.temperature < 0.4) {
@@ -101,14 +99,20 @@ angular.module('infiniworld')
           } else {
             biome = "plains";
             glyph = "::";
-            if ($scope.population > 0.9) {
-              if ($scope.population > 0.98) {
-                glyph = "♚";
-              } else if ($scope.population > 0.94) {
-                  glyph = "♜";
-              } else {
-                glyph = "♟";
-              }
+          }
+          if ($scope.population > 0.5) {
+            if ($scope.population > 0.98) {
+              glyph = "♚";
+            } else if ($scope.population > 0.94) {
+                glyph = "♜";
+            } else {
+              glyph = "♟";
+            }
+            if ($scope.temperature > 0.7) {
+              style["color"] = "white";
+            } else if ($scope.temperature > 0.3) {
+              style["color"] = "grey";
+            } else {
               style["color"] = "black";
             }
           }

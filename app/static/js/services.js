@@ -55,7 +55,30 @@ angular.module('infiniworld')
       // Now sum is sampled from distrib of variance
       return zDistrib.cdf(sum / stdv);
     }
+  };
+  this.peakFilter = function(field, dist) {
+    return function(x, y) {
+      var value = field(x, y);
+      for (dy = -dist; dy < (dist + 1); dy++) {
+        for (dx = -dist; dx < (dist + 1); dx++) {
+          if (field(x + dx, y + dy) > value) {
+            return 0;
+          }
+        }
+      }
+      return value;
+    }
   }
+  this.cutIfBelow = function(field, criteriaField, threshold) {
+    return function(x, y) {
+      if (criteriaField(x, y) < threshold) {
+        return 0;
+      } else {
+        return field(x, y)
+      }
+    }
+  }
+  
   this.memoize = function(f) {
     f.memo = {};
     return function () {

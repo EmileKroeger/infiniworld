@@ -26,7 +26,10 @@ angular.module('infiniworld')
   	var temperature1 = sField.lattitudeAverage(temperature0, 6);
   	$scope.temperature = sField.weightedSum(temperature1, 1, $scope.altitude, -1);
 
-  	$scope.population = memoize(simpleMap(57));
+    population0 = simpleMap(57);
+    population1 = sField.cutIfBelow(population0, $scope.altitude, 0.5);
+  	$scope.population = sField.peakFilter(population0, 2);
+    
   	var humidity0 = memoize(simpleMap(77));
   	$scope.humidity = memoize(neighbourMap(humidity0, 4));
     
