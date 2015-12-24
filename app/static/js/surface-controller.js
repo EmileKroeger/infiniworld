@@ -17,12 +17,16 @@ angular.module('infiniworld')
     var memoize = sField.memoize;
     var simpleMap = sField.simpleMap;
     var neighbourMap = sField.neighbourMap;
-    
-  	var altitude0 = memoize(simpleMap(1));
-  	$scope.altitude = memoize(neighbourMap(altitude0, 6));
+
+    // Altitude
+  	var altitude0 = simpleMap(1);
+  	$scope.altitude = neighbourMap(altitude0, 6);
+    // Temperature
+  	var temperature0 = sField.lattitudeOnly(99);
+  	var temperature1 = sField.lattitudeAverage(temperature0, 6);
+  	$scope.temperature = sField.weightedSum(temperature1, 1, $scope.altitude, -1);
+
   	$scope.population = memoize(simpleMap(57));
-  	var temperature0 = memoize(simpleMap(99));
-  	$scope.temperature = memoize(neighbourMap(temperature0, 4));
   	var humidity0 = memoize(simpleMap(77));
   	$scope.humidity = memoize(neighbourMap(humidity0, 4));
     
