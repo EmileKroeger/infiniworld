@@ -82,14 +82,18 @@ angular.module('infiniworld')
           //style["background-color"] = blended;
           if (($scope.humidity >= 0.8) && ($scope.altitude < 0.7)) {
             biome = "swamp";
-            glyph = "⅋"; // deciduous
-            var yellowgreen = blend(YELLOW, GREEN, 0.8);
-            var swampiness = 5 * ($scope.humidity - 0.8)
-            var blended = blendrgb(yellowgreen, BROWN, swampiness);
-            style["background-color"] = blended;
+            if ($scope.temperature < 0.4) {
+              glyph = "::";
+            } else if ($scope.temperature < 0.6) {
+              glyph = "≚";
+            } else {
+              glyph = "⅋"; // deciduous
+            }
+            var swampColor = blendAbove(coldColor, BROWN, 0.8, $scope.humidity);
+            style["background-color"] = rgb(swampColor);
           } else if ($scope.humidity >= 0.5) {
             biome = "forest";
-            if ($scope.altitude > 0.7) {
+            if ($scope.temperature < 0.5) {
               glyph = "⅊"; //coniferous🌲
             } else {
               glyph = "⅋"; // deciduous
