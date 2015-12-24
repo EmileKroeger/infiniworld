@@ -30,5 +30,13 @@ angular.module('infiniworld')
 		  return zDistrib.cdf(sum / Math.sqrt(delta * delta));
 		};
   }
+  this.memoize = function(f) {
+    f.memo = {};
+    return function () {
+       var args = Array.prototype.slice.call(arguments);
+       return (args in f.memo) ? f.memo[args] :
+                      f.memo[args] = f.apply(this, args);
+   };
+ }
 	return this;
 })

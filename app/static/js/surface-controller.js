@@ -3,7 +3,6 @@ angular.module('infiniworld')
   function ($scope, sField, $routeParams) {
     $scope.x0 = parseInt($routeParams.x);
     $scope.y0 = parseInt($routeParams.y);
-    console.debug([$scope.x0])
     $scope.range = function(min, max, step) {
         step = step || 1;
         var input = [];
@@ -15,13 +14,17 @@ angular.module('infiniworld')
 
   	$scope.map = sField.simpleMap($scope.rows, $scope.cols);
     // Eventually: make these correlated
-  	var altitude0 = sField.simpleMap(1);
-  	$scope.altitude = sField.neighbourMap(altitude0, 6);
-  	$scope.population = sField.simpleMap(57);
-  	var temperature0 = sField.simpleMap(99);
-  	$scope.temperature = sField.neighbourMap(temperature0, 2);
-  	var humidity0 = sField.simpleMap(77);
-  	$scope.humidity = sField.neighbourMap(humidity0, 4);
+    var memoize = sField.memoize;
+    var simpleMap = sField.simpleMap;
+    var neighbourMap = sField.neighbourMap;
+    
+  	var altitude0 = memoize(simpleMap(1));
+  	$scope.altitude = memoize(neighbourMap(altitude0, 6));
+  	$scope.population = memoize(simpleMap(57));
+  	var temperature0 = memoize(simpleMap(99));
+  	$scope.temperature = memoize(neighbourMap(temperature0, 4));
+  	var humidity0 = memoize(simpleMap(77));
+  	$scope.humidity = memoize(neighbourMap(humidity0, 4));
     
     $scope.moveMap = function(dx, dy) {
       $scope.x0 += dx;
@@ -47,7 +50,6 @@ angular.module('infiniworld')
         {chr: '℠', dx: delta,  dy: delta},
       ], 
     ];
-    console.debug($scope.navarrows);
     
     function evaluateDistrib(func) {
       var values = {};
