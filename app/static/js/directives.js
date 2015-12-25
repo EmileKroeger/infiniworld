@@ -1,7 +1,15 @@
 angular.module('infiniworld')
   .directive("infiniworldCellInfo", function() {
+    var calculate = function($scope) {
+      
+    }
+
     var controller = function($scope) {
-      // TODO: stuff
+      // TODO: describe city
+      console.debug($scope.world.altitude($scope.pos.x, $scope.pos.y))
+      $scope.$watch("pos", function() {
+        console.debug($scope.world.altitude($scope.pos.x, $scope.pos.y))
+      });
     };
     return {
       scope: {
@@ -12,6 +20,7 @@ angular.module('infiniworld')
         humidity: '=humidity',
         */
         pos: "=pos",
+        world: "=world",
       },
       controller: controller,
       templateUrl: 'templates/cellinfo.html',
@@ -69,8 +78,29 @@ angular.module('infiniworld')
         return color;
       }
     }
-
     var controller = function($scope) {
+      calculate($scope);
+      if ($scope.dynamic) {
+        $scope.$watch("altitude", function() {
+          // Hack assume altitude changes when we click
+          // true 99.9% of the time, otherwise click elsewhere
+          calculate($scope);
+        })
+      }
+      function updateSelected() {
+        if ($scope.selected) {
+          $scope.style.border = "1px solid red";
+          $scope.style["line-height"] = "18px";
+        } else {
+          $scope.style.border = "";
+          $scope.style["line-height"] = "20px";
+        }
+      }
+      $scope.$watch("selected", updateSelected);
+      updateSelected();
+    }
+
+    var calculate = function($scope) {
       var biome;
       var glyph = "??";
       var style = {};
@@ -157,6 +187,8 @@ angular.module('infiniworld')
         population: '=population',
         temperature: '=temperature',
         humidity: '=humidity',
+        dynamic: '=dynamic',
+        selected: '=selected',
       },
       controller: controller,
       templateUrl: 'templates/surfacecell.html',

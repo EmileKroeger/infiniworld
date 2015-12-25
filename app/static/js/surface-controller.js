@@ -1,8 +1,26 @@
 angular.module('infiniworld')
   .service("sWorldModel", function(sField) {
+    var memoize = sField.memoize;
+    var simpleMap = sField.simpleMap;
+    var neighbourMap = sField.neighbourMap;
+
+    // Altitude
+  	var altitude0 = simpleMap(1);
+  	this.altitude = neighbourMap(altitude0, 6);
+    // Temperature
+  	var temperature0 = sField.lattitudeOnly(99);
+  	var temperature1 = sField.lattitudeAverage(temperature0, 6);
+  	this.temperature = sField.weightedSum(temperature1, 1, this.altitude, -1);
+
+    population0 = simpleMap(57);
+    population1 = sField.cutIfBelow(population0, this.altitude, 0.5);
+  	this.population = sField.peakFilter(population0, 2);
+    
+  	var humidity0 = memoize(simpleMap(77));
+  	this.humidity = memoize(neighbourMap(humidity0, 4));
   })
-  .controller('SurfaceController', ['$scope', 'sField', '$routeParams',
-  function ($scope, sField, $routeParams) {
+  .controller('SurfaceController', ['$scope', '$routeParams', 'sWorldModel',
+  function ($scope, $routeParams, sWorldModel) {
     $scope.x0 = parseInt($routeParams.x);
     $scope.y0 = parseInt($routeParams.y);
     $scope.range = function(min, max, step) {
@@ -14,32 +32,13 @@ angular.module('infiniworld')
         return input;
     };
     // Cell selection handling
-    $scope.selectedPos = null;
+    $scope.selectedPos = {'x': $scope.x0, 'y': $scope.y0};
     $scope.select = function(x, y) {
       $scope.selectedPos = {'x': x, 'y': y};
-    }
-
-  	$scope.map = sField.simpleMap($scope.rows, $scope.cols);
-    // Eventually: make these correlated
-    var memoize = sField.memoize;
-    var simpleMap = sField.simpleMap;
-    var neighbourMap = sField.neighbourMap;
-
-    // Altitude
-  	var altitude0 = simpleMap(1);
-  	$scope.altitude = neighbourMap(altitude0, 6);
-    // Temperature
-  	var temperature0 = sField.lattitudeOnly(99);
-  	var temperature1 = sField.lattitudeAverage(temperature0, 6);
-  	$scope.temperature = sField.weightedSum(temperature1, 1, $scope.altitude, -1);
-
-    population0 = simpleMap(57);
-    population1 = sField.cutIfBelow(population0, $scope.altitude, 0.5);
-  	$scope.population = sField.peakFilter(population0, 2);
+    };
     
-  	var humidity0 = memoize(simpleMap(77));
-  	$scope.humidity = memoize(neighbourMap(humidity0, 4));
-    
+    $scope.world = sWorldModel;
+
     $scope.moveMap = function(dx, dy) {
       $scope.x0 += dx;
       $scope.y0 += dy;
@@ -81,5 +80,5 @@ angular.module('infiniworld')
         console.log([bin, values[bin]]);
       }
     }
-    //evaluateDistrib($scope.humidity);
+    //evaluateDistrib(world.humidity);
   }]);

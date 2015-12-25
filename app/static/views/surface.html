@@ -4,6 +4,7 @@
   <!--
   <div style="font-family: Symbola">ℜℝ℟℠</div>
   <div class="navarrow">ℛ ℞ ℡ ™</div>
+    15, 30
   -->
     
   
@@ -12,10 +13,12 @@
       ng-repeat="x in range(x0, x0 + 30)"
       ng-click="select(x, y);"
       class="col-xs-1 surfacecell"
-      altitude="altitude(x, y)"
-      population="population(x, y)"
-      temperature="temperature(x, y)"
-      humidity="humidity(x, y)"
+      altitude="world.altitude(x, y)"
+      population="world.population(x, y)"
+      temperature="world.temperature(x, y)"
+      humidity="world.humidity(x, y)"
+      dynamic="false"
+      selected="(selectedPos.x == x) && (selectedPos.y == y)"
       >
     </div>
     <div 
@@ -26,6 +29,6 @@
       {{arrow.chr}}
     </div>
   </div>
-  <div class="infobox col-md-3" infiniworld-cell-info pos="selectedPos">
+  <div class="infobox col-md-3" infiniworld-cell-info pos="selectedPos" world="world"">
   </div>
 </div>
