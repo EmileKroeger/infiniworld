@@ -10,6 +10,7 @@
   <div ng-repeat="y in range(y0, y0 + 15)" class="row">
     <div infiniworld-cell
       ng-repeat="x in range(x0, x0 + 30)"
+      ng-click="select(x, y);"
       class="col-xs-1 surfacecell"
       altitude="altitude(x, y)"
       population="population(x, y)"
@@ -24,5 +25,7 @@
       >
       {{arrow.chr}}
     </div>
+  </div>
+  <div class="infobox col-md-3" infiniworld-cell-info pos="selectedPos">
   </div>
 </div>

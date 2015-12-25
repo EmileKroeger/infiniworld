@@ -1,4 +1,6 @@
 angular.module('infiniworld')
+  .service("sWorldModel", function(sField) {
+  })
   .controller('SurfaceController', ['$scope', 'sField', '$routeParams',
   function ($scope, sField, $routeParams) {
     $scope.x0 = parseInt($routeParams.x);
@@ -11,6 +13,11 @@ angular.module('infiniworld')
         }
         return input;
     };
+    // Cell selection handling
+    $scope.selectedPos = null;
+    $scope.select = function(x, y) {
+      $scope.selectedPos = {'x': x, 'y': y};
+    }
 
   	$scope.map = sField.simpleMap($scope.rows, $scope.cols);
     // Eventually: make these correlated

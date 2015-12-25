@@ -1,4 +1,22 @@
 angular.module('infiniworld')
+  .directive("infiniworldCellInfo", function() {
+    var controller = function($scope) {
+      // TODO: stuff
+    };
+    return {
+      scope: {
+        /*
+        altitude: '=altitude',
+        population: '=population',
+        temperature: '=temperature',
+        humidity: '=humidity',
+        */
+        pos: "=pos",
+      },
+      controller: controller,
+      templateUrl: 'templates/cellinfo.html',
+    };
+  })
   .directive("infiniworldCell", function() {
     var c255 = function(advance) {
       return Math.round(advance * 255);
