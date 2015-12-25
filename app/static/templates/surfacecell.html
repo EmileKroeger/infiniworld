@@ -1,3 +1,6 @@
-<div ng-class="biome" title="p: {{population}}" ng-style="style">
+<div ng-class="biome" title="p: {{population}}" ng-style="style" style="position: relative;">
   {{glyph}}
+  <div ng-if="overglyph" class="surfacecell overcell" ng-style="overstyle">
+    {{overglyph}}
+  </div>
 </div>

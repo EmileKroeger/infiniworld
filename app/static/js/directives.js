@@ -56,11 +56,13 @@ angular.module('infiniworld')
       var biome;
       var glyph = "??";
       var style = {};
+      var overglyph = null;
+      var overstyle = {};
       if ($scope.altitude < 0.5) {
         biome = "sea";
         glyph = "~";
         var waveColor = blendrgb(DARKBLUE, BLUE, 2*$scope.altitude);
-        style["color"] = waveColor;
+        style["bcolor"] = waveColor;
       } else {
         var vegColor = blend(YELLOW, GREEN, $scope.humidity);
         var altColor = blendAbove(vegColor, GREY, 0.9, $scope.altitude)
@@ -101,19 +103,26 @@ angular.module('infiniworld')
             glyph = "::";
           }
           if ($scope.population > 0.5) {
+            // Some kind of inhabitation
             if ($scope.population > 0.98) {
               glyph = "♚";
+              overglyph = "♔";
             } else if ($scope.population > 0.94) {
-                glyph = "♜";
+              glyph = "♜";
+              overglyph = "♖";
             } else {
               glyph = "♟";
+              overglyph = "♙";
             }
             if ($scope.temperature > 0.7) {
               style["color"] = "white";
+              overstyle["color"] = "blue";
             } else if ($scope.temperature > 0.3) {
               style["color"] = "grey";
+              overstyle["color"] = "black";
             } else {
               style["color"] = "black";
+              overglyph = null;
             }
           }
         }
@@ -121,6 +130,8 @@ angular.module('infiniworld')
       $scope.biome = biome;
       $scope.glyph = glyph;
       $scope.style = style;
+      $scope.overglyph = overglyph;
+      $scope.overstyle = overstyle;
     }
     return {
       scope: {

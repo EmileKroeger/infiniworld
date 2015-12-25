@@ -24,6 +24,13 @@ body {
   text-align: center;
 }
 
+.overcell {
+  position: absolute;
+  color: black;
+  left: 0;
+  top: 0;
+}
+
 .sea {
   background-color: rgb(0%, 0%, 80%);
   color: rgb(0%, 0%, 85%);
