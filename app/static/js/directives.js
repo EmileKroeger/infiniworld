@@ -1,14 +1,13 @@
 angular.module('infiniworld')
   .directive("infiniworldCellInfo", function() {
-    var calculate = function($scope) {
-      
+    var refresh = function($scope) {
+      $scope.cityname = "CITY NAME " + $scope.pos.x;
+      // TODO: check if city is there
     }
 
     var controller = function($scope) {
-      // TODO: describe city
-      console.debug($scope.world.altitude($scope.pos.x, $scope.pos.y))
       $scope.$watch("pos", function() {
-        console.debug($scope.world.altitude($scope.pos.x, $scope.pos.y))
+        refresh($scope)
       });
     };
     return {
@@ -78,13 +77,13 @@ angular.module('infiniworld')
         return color;
       }
     }
-    var controller = function($scope) {
-      calculate($scope);
+    var controller = function($scope, sBiomes) {
+      calculate($scope, sBiomes);
       if ($scope.dynamic) {
         $scope.$watch("altitude", function() {
           // Hack assume altitude changes when we click
           // true 99.9% of the time, otherwise click elsewhere
-          calculate($scope);
+          calculate($scope, sBiomes);
         })
       }
       function updateSelected() {
@@ -100,14 +99,13 @@ angular.module('infiniworld')
       updateSelected();
     }
 
-    var calculate = function($scope) {
-      var biome;
+    var calculate = function($scope, sBiomes) {
+      var biome = sBiomes.getBiome($scope);
       var glyph = "??";
       var style = {};
       var overglyph = null;
       var overstyle = {};
-      if ($scope.altitude < 0.5) {
-        biome = "sea";
+      if (biome == "sea") {
         glyph = "~";
         var waveColor = blendrgb(DARKBLUE, BLUE, 2*$scope.altitude);
         style["bcolor"] = waveColor;
@@ -116,20 +114,17 @@ angular.module('infiniworld')
         var altColor = blendAbove(vegColor, GREY, 0.9, $scope.altitude)
         var coldColor = blendBelow(altColor, WHITE, 0.3, $scope.temperature)
         style["background-color"] = rgb(coldColor);
-        if ($scope.altitude > 0.9) {
-          biome = "mountain";
+        if (biome == "mountain") {
           if ($scope.population > 0.95) {
             glyph = "⚒";
           } else {
             glyph = "◭";
           }
           var color = blendAbove(vegColor, GREY, 0.9, $scope.altitude)
-        } else if ($scope.temperature < 0.2){
-          biome = "tundra";
+        } else if (biome == "tundra"){
           glyph = "::";
         } else {
-          if (($scope.humidity >= 0.8) && ($scope.altitude < 0.7)) {
-            biome = "swamp";
+          if (biome == "swamp") {
             if ($scope.temperature < 0.4) {
               glyph = "::";
             } else if ($scope.temperature < 0.6) {
@@ -139,19 +134,14 @@ angular.module('infiniworld')
             }
             var swampColor = blendAbove(coldColor, BROWN, 0.8, $scope.humidity);
             style["background-color"] = rgb(swampColor);
-          } else if ($scope.humidity >= 0.5) {
-            biome = "forest";
+          } else if (biome == "forest") {
             if ($scope.temperature < 0.5) {
               glyph = "⅊"; //coniferous🌲
             } else {
               glyph = "⅋"; // deciduous
             }
-          } else {
-            biome = "plains";
-            glyph = "::";
-          }
-          if ($scope.population > 0.5) {
-            // Some kind of inhabitation
+          } else if (biome == "city") {
+            // Some kind of habitation
             if ($scope.population > 0.98) {
               glyph = "♚";
               overglyph = "♔";
@@ -162,6 +152,7 @@ angular.module('infiniworld')
               glyph = "♟";
               overglyph = "♙";
             }
+            // And i's temperature-dependant color
             if ($scope.temperature > 0.7) {
               style["color"] = "white";
               overstyle["color"] = "blue";
@@ -172,6 +163,8 @@ angular.module('infiniworld')
               style["color"] = "black";
               overglyph = null;
             }
+          } else if (biome == "plains"){
+            glyph = "::";
           }
         }
       }

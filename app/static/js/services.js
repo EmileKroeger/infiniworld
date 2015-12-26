@@ -1,4 +1,26 @@
 angular.module('infiniworld')
+.service("sBiomes", function() {
+  this.test = function() {
+    return "Got sBiomes..";
+  };
+  this.getBiome = function(cell) {
+    if (cell.altitude < 0.5) {
+      return "sea";
+    } else if (cell.altitude > 0.9) {
+      return "mountain";
+    } else if (cell.temperature < 0.2){
+      return "tundra";
+    } else if ((cell.humidity >= 0.8) && (cell.altitude < 0.7)) {
+      return "swamp";
+    } else if (cell.humidity >= 0.5) {
+      return "forest";
+    } else if (cell.population > 0.5) {
+      return "city";
+    } else {
+      return "plains";
+    }
+  }
+})
 .service("sField", function() {
   var zDistrib = gaussian(0, 1);
   //var sample = zDistrib.ppf(Math.random());
