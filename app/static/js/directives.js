@@ -1,17 +1,66 @@
 angular.module('infiniworld')
-  .directive("infiniworldCellInfo", function() {
-    var refresh = function($scope, sBiomes) {
-      $scope.biome = sBiomes.getBiome($scope.cell);
-      if ($scope.biome == "city") {
-        $scope.cityname = "CITY NAME " + $scope.pos.x;
-      } else {
-        $scope.cityname = null;
-      }
+  .service("sMarkov", function() {
+    this.generator = function(words) {
+      // TODO: make transitions
+      return "Gottenburg";
+    };
+  })
+  .service("sRandomUtils", function() {
+    var KEYWORD_RE = /\[(\w+)\]/g;
+    self = this;
+    this.pick = function pick(list, key) {
+      return list[Math.floor((key % 1) * list.length)];
     }
-
-    var controller = function($scope, sBiomes) {
+    this.build = function build(dic, name, key) {
+      var result = self.pick(dic[name], key);
+      result = result.replace(KEYWORD_RE, function(m, w) {
+        key = (key + 0.3) * 11;
+        return self.build(dic, w, key);
+      })
+      return result;
+    }
+  })
+  .service("sStringGen", function($http, sRandomUtils) {
+    this.generate = function(filepath, name, key, callback) {
+      $http.get(filepath).then(function(r) {
+        callback(sRandomUtils.build(r.data, name, key));
+      });
+    };
+    this.townname = function(key, callback) {
+      return this.generate("data/townnames.json", "main", key,
+      callback);
+    }
+  })
+  .service("sCities", function(sField, sMarkov, sStringGen) {
+    keyField = sField.simpleMap(117);
+    function makeName(key) {
+      var before = ["Gotten", "Snow", "Fried"];
+      var after = ["hall", "burg", "town", "ton"];
+      return pick(before, (key * 7)) + pick(after, (key + 0.5) * 11)
+    }
+    RACES = ["human", "elf", "orc", "dwarf", "goblin"]
+    this.get = function(world, pos) {
+      var key = keyField(pos.x, pos.y);
+      var city = {};
+      city.name = "..."; 
+      sStringGen.townname(key, function(name) {
+        city.name = name;
+      })
+      return city;
+    };
+  })
+  .directive("infiniworldCellInfo", function() {
+    var controller = function($scope, sBiomes, sCities) {
+      var refresh = function() {
+        $scope.biome = sBiomes.getBiome($scope.cell);
+        if ($scope.biome == "city") {
+          $scope.city = sCities.get($scope.world, $scope.pos);
+        } else {
+          $scope.city = null;
+        }
+      };
       $scope.$watch("pos", function() {
-        refresh($scope, sBiomes)
+        refresh()
       });
     };
     return {
