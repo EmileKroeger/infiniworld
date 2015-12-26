@@ -1,23 +1,22 @@
 angular.module('infiniworld')
   .directive("infiniworldCellInfo", function() {
-    var refresh = function($scope) {
-      $scope.cityname = "CITY NAME " + $scope.pos.x;
-      // TODO: check if city is there
+    var refresh = function($scope, sBiomes) {
+      $scope.biome = sBiomes.getBiome($scope.cell);
+      if ($scope.biome == "city") {
+        $scope.cityname = "CITY NAME " + $scope.pos.x;
+      } else {
+        $scope.cityname = null;
+      }
     }
 
-    var controller = function($scope) {
+    var controller = function($scope, sBiomes) {
       $scope.$watch("pos", function() {
-        refresh($scope)
+        refresh($scope, sBiomes)
       });
     };
     return {
       scope: {
-        /*
-        altitude: '=altitude',
-        population: '=population',
-        temperature: '=temperature',
-        humidity: '=humidity',
-        */
+        cell: "=cell",
         pos: "=pos",
         world: "=world",
       },
@@ -123,49 +122,47 @@ angular.module('infiniworld')
           var color = blendAbove(vegColor, GREY, 0.9, $scope.altitude)
         } else if (biome == "tundra"){
           glyph = "::";
-        } else {
-          if (biome == "swamp") {
-            if ($scope.temperature < 0.4) {
-              glyph = "::";
-            } else if ($scope.temperature < 0.6) {
-              glyph = "≚";
-            } else {
-              glyph = "⅋"; // deciduous
-            }
-            var swampColor = blendAbove(coldColor, BROWN, 0.8, $scope.humidity);
-            style["background-color"] = rgb(swampColor);
-          } else if (biome == "forest") {
-            if ($scope.temperature < 0.5) {
-              glyph = "⅊"; //coniferous🌲
-            } else {
-              glyph = "⅋"; // deciduous
-            }
-          } else if (biome == "city") {
-            // Some kind of habitation
-            if ($scope.population > 0.98) {
-              glyph = "♚";
-              overglyph = "♔";
-            } else if ($scope.population > 0.94) {
-              glyph = "♜";
-              overglyph = "♖";
-            } else {
-              glyph = "♟";
-              overglyph = "♙";
-            }
-            // And i's temperature-dependant color
-            if ($scope.temperature > 0.7) {
-              style["color"] = "white";
-              overstyle["color"] = "blue";
-            } else if ($scope.temperature > 0.3) {
-              style["color"] = "grey";
-              overstyle["color"] = "black";
-            } else {
-              style["color"] = "black";
-              overglyph = null;
-            }
-          } else if (biome == "plains"){
+        } else if (biome == "swamp") {
+          if ($scope.temperature < 0.4) {
             glyph = "::";
+          } else if ($scope.temperature < 0.6) {
+            glyph = "≚";
+          } else {
+            glyph = "⅋"; // deciduous
           }
+          var swampColor = blendAbove(coldColor, BROWN, 0.8, $scope.humidity);
+          style["background-color"] = rgb(swampColor);
+        } else if (biome == "forest") {
+          if ($scope.temperature < 0.5) {
+            glyph = "⅊"; //coniferous🌲
+          } else {
+            glyph = "⅋"; // deciduous
+          }
+        } else if (biome == "city") {
+          // Some kind of habitation
+          if ($scope.population > 0.98) {
+            glyph = "♚";
+            overglyph = "♔";
+          } else if ($scope.population > 0.94) {
+            glyph = "♜";
+            overglyph = "♖";
+          } else {
+            glyph = "♟";
+            overglyph = "♙";
+          }
+          // And i's temperature-dependant color
+          if ($scope.temperature > 0.7) {
+            style["color"] = "white";
+            overstyle["color"] = "blue";
+          } else if ($scope.temperature > 0.3) {
+            style["color"] = "grey";
+            overstyle["color"] = "black";
+          } else {
+            style["color"] = "black";
+            overglyph = null;
+          }
+        } else if (biome == "plains"){
+          glyph = "::";
         }
       }
       $scope.biome = biome;

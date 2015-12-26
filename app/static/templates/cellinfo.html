@@ -3,7 +3,7 @@
     Nothing selected
   </div>
   <div ng-if="pos">
-    Cell {{pos.x}}, {{pos.y}} att {{world.altitude(pos.x, pos.y)}}
+    {{biome}} ({{pos.x}}, {{pos.y}})
     <div infiniworld-cell
       class="col-xs-1 surfacecell"
       altitude="world.altitude(pos.x, pos.y)"
@@ -14,6 +14,10 @@
       selected="true"
       >
     </div>
-    <h3>{{cityname}}</h3>
+    <!--
+    <br>Cell at {{cell.altitude}}
+      -->
+    
+    <h3 ng-if="cityname">{{cityname}}</h3>
   </div>
 </div>
