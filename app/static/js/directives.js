@@ -30,6 +30,10 @@ angular.module('infiniworld')
       return this.generate("data/townnames.json", "main", key,
       callback);
     }
+    this.fantasyregion = function(key, callback) {
+      return this.generate("data/fantasyregion.json", "main", key,
+      callback);
+    }
   })
   .service("sCities", function(sField, sMarkov, sStringGen) {
     keyField = sField.simpleMap(117);
@@ -42,10 +46,17 @@ angular.module('infiniworld')
     this.get = function(world, pos) {
       var key = keyField(pos.x, pos.y);
       var city = {};
-      city.name = "..."; 
+      city.name = null; 
+      city.description = null;
+      city.features = [];
       sStringGen.townname(key, function(name) {
         city.name = name;
-      })
+      });
+      sStringGen.fantasyregion(key, function(descr) {
+        var head_tail = descr.split("<ul><li>");
+        city.description = head_tail[0];
+        city.features = head_tail[1].split("<li>")
+      });
       return city;
     };
   })

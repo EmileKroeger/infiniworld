@@ -19,5 +19,11 @@
       -->
     
     <h3 ng-if="city">{{city.name}}</h3>
+    <p>{{city.description}}</p>
+    <ul>
+      <li ng-repeat="feature in city.features">
+        {{feature}}
+      </li>
+    </ul>
   </div>
 </div>
