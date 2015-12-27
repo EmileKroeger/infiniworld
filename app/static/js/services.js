@@ -51,16 +51,33 @@ angular.module('infiniworld')
     return this.generate("splats", "main", key);
   };
 })
-.service("sCultures", function(sField, sStringGen) {
-  keyField = sField.simpleMap(43);
-  nameKeyField = sField.simpleMap(817);
+.service("sCultures", function(sField, sStringGen, sRandomUtils) {
+  var NATIONKINDS = ["Kingdom", "Kingdom", "Empire", "Republic",
+                     "Kingdom", "Kingdom", "Empire", "Republic",
+                     "Confederacy", "Grand-duchy"]
+  var RACES = ["Human", "Human", "Human", "Elf", "Elf", "Dwarf",
+               "Orc", "Goblin"]
+  var keyField = sField.simpleMap(43);
+  var raceKeyField = sField.simpleMap(87);
+  var kindKeyField = sField.simpleMap(711);
+  var nameKeyField = sField.simpleMap(817);
   var INFLUENCE_RANGE = 2;
   this.getCulture = function(i, j) {
     var culture = {};
     var key = keyField(i, j);
     if (key > 0.8) {
-      culture["nation"] = "Kingdom of " + sStringGen.townname(nameKeyField(i, j));
+      // Nation! For now, simple.
+      var kind = sRandomUtils.pick(NATIONKINDS, kindKeyField(i, j));
+      var basename = sStringGen.townname(nameKeyField(i, j))
+      culture["nation"] = kind + " of " + basename;
+      if (key > 0.85) {
+        culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j))
+      }
     }
+    else if (key > 0.6) {
+      culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j))
+    }
+    // Also possible: religion, conspiracies, ancient empires
     culture.influence = 0.1 + key;
     return culture;
   }
@@ -90,6 +107,10 @@ angular.module('infiniworld')
     return this.getMostInfluent(pos, "nation");
     // If no nation, it'll be a city-state.
   };
+  this.getRace = function(pos) {
+    return this.getMostInfluent(pos, "race");
+    // If no nation, it'll be a city-state.
+  };
 })
 .service("sCities", function(sField, sStringGen, sCultures) {
   keyField = sField.simpleMap(117);
@@ -99,6 +120,7 @@ angular.module('infiniworld')
     var city = {
       nation: sCultures.getNation(pos),
       name: sStringGen.townname(key),
+      race: sCultures.getRace(pos),
     };
     var descr = sStringGen.fantasyregion(key);
     var head_tail = descr.split("<ul><li>");
