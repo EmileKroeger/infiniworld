@@ -36,10 +36,16 @@ angular.module('infiniworld')
       return knownCells[key];
     };
   })
-  .controller('SurfaceController', ['$scope', '$routeParams', 'sWorldModel',
-  function ($scope, $routeParams, sWorldModel) {
+  .controller('SurfaceController', ['$scope', '$routeParams', 'sWorldModel', 'sStringGen',
+  function ($scope, $routeParams, sWorldModel, sStringGen) {
     $scope.x0 = parseInt($routeParams.x);
     $scope.y0 = parseInt($routeParams.y);
+    $scope.loaded = false;
+    sStringGen.load(function() {
+      $scope.loaded = true;
+    });
+
+
     $scope.range = function(min, max, step) {
         step = step || 1;
         var input = [];

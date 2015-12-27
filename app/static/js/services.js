@@ -15,44 +15,58 @@ angular.module('infiniworld')
   }
 })
 .service("sStringGen", function($http, sRandomUtils) {
-  this.generate = function(filepath, name, key, callback) {
-    $http.get(filepath).then(function(r) {
-      callback(sRandomUtils.build(r.data, name, key));
+  var data = {};
+  this.data = data;
+  this.load = function(callback) {
+    var sources = ["fantasyregion", "townnames", "pairednames",
+                   "splats"];
+    var pending = sources.length;
+    angular.forEach(sources, function(source) {
+      $http.get("data/" + source + ".json").then(function(r) {
+        data[source] = r.data;
+        pending -= 1;
+        if (!pending) {
+          callback();
+        }
+      });
     });
   };
-  this.townname = function(key, callback) {
+  this.generate = function(source, name, key) {
+    return sRandomUtils.build(this.data[source], name, key);
+  };
+  this.townname = function(key) {
     var source;
     if (key < 0.5) {
-      source = "data/townnames.json";
+      source = "townnames";
     } else {
-      source = "data/pairednames.json";
+      source = "pairednames";
     }
     key = 2 * key;
-    return this.generate(source, "main", key, callback);
+    return this.generate(source, "main", key);
   };
-  this.fantasyregion = function(key, callback) {
-    return this.generate("data/fantasyregion.json", "main", key,
-    callback);
+  this.fantasyregion = function(key) {
+    return this.generate("fantasyregion", "main", key);
   };
-  this.faction = function(key, callback) {
-    return this.generate("data/splats.json", "main", key,
-    callback);
+  this.faction = function(key) {
+    return this.generate("splats", "main", key);
   };
 })
 .service("sCultures", function(sField, sStringGen) {
   keyField = sField.simpleMap(43);
+  nameKeyField = sField.simpleMap(817);
   var INFLUENCE_RANGE = 2;
   this.getCulture = function(i, j) {
     var culture = {};
-    if (keyField(i, j) > 0.8) {
-      culture["nation"] = "kingdom " + i + "-" + j;
+    var key = keyField(i, j);
+    if (key > 0.8) {
+      culture["nation"] = "Kingdom of " + sStringGen.townname(nameKeyField(i, j));
     }
-    culture.influence = 0.1 + keyField(i, j);
+    culture.influence = 0.1 + key;
     return culture;
   }
   this.getMostInfluent = function(pos, attribute) {
     var i0 = Math.floor(pos.x / 8);
-    var j0 = Math.floor(pos.x / 8);
+    var j0 = Math.floor(pos.y / 8);
     var closestIDist = 100000000;
     var mostInfluent = null;
     for (di = -INFLUENCE_RANGE; di <= INFLUENCE_RANGE; di++) {
@@ -82,23 +96,15 @@ angular.module('infiniworld')
   //RACES = ["human", "elf", "orc", "dwarf", "goblin"]
   this.get = function(world, pos) {
     var key = keyField(pos.x, pos.y);
-    var city = {};
-    city.name = null; 
-    city.description = null;
-    city.features = [];
-    city.factions = [];
-    city.nation = sCultures.getNation(pos);
-    sStringGen.townname(key, function(name) {
-      city.name = name;
-    });
-    sStringGen.fantasyregion(key, function(descr) {
-      var head_tail = descr.split("<ul><li>");
-      city.description = head_tail[0];
-      city.features = head_tail[1].split("<li>")
-    });
-    sStringGen.faction(key, function(faction) {
-      city.factions.push(faction);
-    });
+    var city = {
+      nation: sCultures.getNation(pos),
+      name: sStringGen.townname(key),
+    };
+    var descr = sStringGen.fantasyregion(key);
+    var head_tail = descr.split("<ul><li>");
+    city.description = head_tail[0];
+    city.features = head_tail[1].split("<li>");
+    city.factions = [sStringGen.faction(key)]
     return city;
   };
 })
