@@ -1,4 +1,71 @@
 angular.module('infiniworld')
+.service("sRandomUtils", function() {
+  var KEYWORD_RE = /\[([\w ]+)\]/g;
+  self = this;
+  this.pick = function pick(list, key) {
+    return list[Math.floor((key % 1) * list.length)];
+  }
+  this.build = function build(dic, name, key) {
+    var result = self.pick(dic[name], key);
+    result = result.replace(KEYWORD_RE, function(m, w) {
+      key = (key + 0.3) * 11;
+      return self.build(dic, w, key);
+    })
+    return result;
+  }
+})
+.service("sStringGen", function($http, sRandomUtils) {
+  this.generate = function(filepath, name, key, callback) {
+    $http.get(filepath).then(function(r) {
+      callback(sRandomUtils.build(r.data, name, key));
+    });
+  };
+  this.townname = function(key, callback) {
+    var source;
+    if (key < 0.5) {
+      source = "data/townnames.json";
+    } else {
+      source = "data/pairednames.json";
+    }
+    key = 2 * key;
+    return this.generate(source, "main", key, callback);
+  };
+  this.fantasyregion = function(key, callback) {
+    return this.generate("data/fantasyregion.json", "main", key,
+    callback);
+  };
+  this.faction = function(key, callback) {
+    return this.generate("data/splats.json", "main", key,
+    callback);
+  };
+})
+.service("sCultures", function(sField) {
+  keyField = sField.simpleMap(43);
+})
+.service("sCities", function(sField, sStringGen, sCultures) {
+  keyField = sField.simpleMap(117);
+  //RACES = ["human", "elf", "orc", "dwarf", "goblin"]
+  this.get = function(world, pos) {
+    var key = keyField(pos.x, pos.y);
+    var city = {};
+    city.name = null; 
+    city.description = null;
+    city.features = [];
+    city.factions = [];
+    sStringGen.townname(key, function(name) {
+      city.name = name;
+    });
+    sStringGen.fantasyregion(key, function(descr) {
+      var head_tail = descr.split("<ul><li>");
+      city.description = head_tail[0];
+      city.features = head_tail[1].split("<li>")
+    });
+    sStringGen.faction(key, function(faction) {
+      city.factions.push(faction);
+    });
+    return city;
+  };
+})
 .service("sBiomes", function() {
   this.test = function() {
     return "Got sBiomes..";
@@ -8,14 +75,14 @@ angular.module('infiniworld')
       return "sea";
     } else if (cell.altitude > 0.9) {
       return "mountain";
+    } else if (cell.population > 0.5) {
+      return "city";
     } else if (cell.temperature < 0.2){
       return "tundra";
     } else if ((cell.humidity >= 0.8) && (cell.altitude < 0.7)) {
       return "swamp";
     } else if (cell.humidity >= 0.5) {
       return "forest";
-    } else if (cell.population > 0.5) {
-      return "city";
     } else {
       return "plains";
     }

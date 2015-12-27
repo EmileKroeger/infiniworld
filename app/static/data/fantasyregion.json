@@ -313,7 +313,7 @@
     "an unwed"
   ], 
   "main": [
-    "[Display]<li>It is ruled by [Ruler].<li>[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment].</ul>"
+    "[Display]<li>It is ruled by [Ruler].<li>[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."
   ], 
   "main2": [
     "The people of this domain are [CitizenQuality]", 
