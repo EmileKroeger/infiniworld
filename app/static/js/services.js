@@ -39,8 +39,43 @@ angular.module('infiniworld')
     callback);
   };
 })
-.service("sCultures", function(sField) {
+.service("sCultures", function(sField, sStringGen) {
   keyField = sField.simpleMap(43);
+  var INFLUENCE_RANGE = 2;
+  this.getCulture = function(i, j) {
+    var culture = {};
+    if (keyField(i, j) > 0.8) {
+      culture["nation"] = "kingdom " + i + "-" + j;
+    }
+    culture.influence = 0.1 + keyField(i, j);
+    return culture;
+  }
+  this.getMostInfluent = function(pos, attribute) {
+    var i0 = Math.floor(pos.x / 8);
+    var j0 = Math.floor(pos.x / 8);
+    var closestIDist = 100000000;
+    var mostInfluent = null;
+    for (di = -INFLUENCE_RANGE; di <= INFLUENCE_RANGE; di++) {
+      for (dj = -INFLUENCE_RANGE; dj <= INFLUENCE_RANGE; dj++) {
+        var culture = this.getCulture(i0 + di, j0 + dj);
+        if (culture[attribute]) {
+          var dist2 = di*di + dj*dj;
+          // This means even a culture with no influence will
+          // win at dist = 0
+          var iDist = dist2 / culture.influence;
+          if ((iDist < closestIDist) || (closestIDist == -1)) {
+            mostInfluent = culture[attribute];
+          }
+        }
+      }
+    }
+    return mostInfluent;
+  }
+  
+  this.getNation = function(pos) {
+    return this.getMostInfluent(pos, "nation");
+    // If no nation, it'll be a city-state.
+  };
 })
 .service("sCities", function(sField, sStringGen, sCultures) {
   keyField = sField.simpleMap(117);
@@ -52,6 +87,7 @@ angular.module('infiniworld')
     city.description = null;
     city.features = [];
     city.factions = [];
+    city.nation = sCultures.getNation(pos);
     sStringGen.townname(key, function(name) {
       city.name = name;
     });
