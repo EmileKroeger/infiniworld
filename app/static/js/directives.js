@@ -6,7 +6,7 @@ angular.module('infiniworld')
     };
   })
   .service("sRandomUtils", function() {
-    var KEYWORD_RE = /\[(\w+)\]/g;
+    var KEYWORD_RE = /\[([\w ]+)\]/g;
     self = this;
     this.pick = function pick(list, key) {
       return list[Math.floor((key % 1) * list.length)];
@@ -27,13 +27,23 @@ angular.module('infiniworld')
       });
     };
     this.townname = function(key, callback) {
-      return this.generate("data/townnames.json", "main", key,
-      callback);
-    }
+      var source;
+      if (key < 0.5) {
+        source = "data/townnames.json";
+      } else {
+        source = "data/pairednames.json";
+      }
+      key = 2 * key;
+      return this.generate(source, "main", key, callback);
+    };
     this.fantasyregion = function(key, callback) {
       return this.generate("data/fantasyregion.json", "main", key,
       callback);
-    }
+    };
+    this.faction = function(key, callback) {
+      return this.generate("data/splats.json", "main", key,
+      callback);
+    };
   })
   .service("sCities", function(sField, sMarkov, sStringGen) {
     keyField = sField.simpleMap(117);
@@ -49,6 +59,7 @@ angular.module('infiniworld')
       city.name = null; 
       city.description = null;
       city.features = [];
+      city.factions = [];
       sStringGen.townname(key, function(name) {
         city.name = name;
       });
@@ -56,6 +67,9 @@ angular.module('infiniworld')
         var head_tail = descr.split("<ul><li>");
         city.description = head_tail[0];
         city.features = head_tail[1].split("<li>")
+      });
+      sStringGen.faction(key, function(faction) {
+        city.factions.push(faction);
       });
       return city;
     };

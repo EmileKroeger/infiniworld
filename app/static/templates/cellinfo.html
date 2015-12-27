@@ -25,5 +25,13 @@
         {{feature}}
       </li>
     </ul>
+    <div ng-if="city.factions.length">
+      Factions:
+    <ul>
+      <li ng-repeat="faction in city.factions">
+        {{faction}}
+      </li>
+    </ul>
+    </div>
   </div>
 </div>
