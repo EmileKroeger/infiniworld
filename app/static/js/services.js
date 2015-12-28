@@ -60,6 +60,7 @@ angular.module('infiniworld')
   var HERALDIC_COLORS = ["red", "blue", "white", "black", "green", "yellow"];
   var FLAG_PATTERNS = [
     "linear-gradient(to right, COLA, COLA 50%, COLB 50%, COLB)",
+    "linear-gradient(to bottom, COLA, COLA 50%, COLB 50%, COLB)",
     "linear-gradient(to right, COLA, COLA 33%, COLB 33%, COLB 67%, COLA 67%, COLA)",
   ];
   var keyField = sField.simpleMap(43);

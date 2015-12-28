@@ -42,6 +42,7 @@ body {
   display: inline-block;
   white-space: nowrap;
   transform: translate(-50%, 0px);
+  pointer-events: none;
 }
 
 .cityflag {
@@ -49,8 +50,8 @@ body {
   position: absolute;
   top: -5px;
   left: 10px;
-  width: 10px;
-  height: 7px;
+  width: 12px;
+  height: 8px;
   border: 1px solid black;
 }
 

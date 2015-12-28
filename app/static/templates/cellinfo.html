@@ -17,24 +17,27 @@
     <!--
     <br>Cell at {{cell.altitude}}
     <p>Nation colors: {{city.nation.colors}}</p>
+
       -->
     
-    <h3 ng-if="city">{{city.name}}</h3>
-    <p>Nation: {{city.nation.name}}</p>
-    <p>Race: {{city.race}}</p>
-    <p>{{city.description}}</p>
-    <ul>
-      <li ng-repeat="feature in city.features">
-        {{feature}}
-      </li>
-    </ul>
-    <div ng-if="city.factions.length">
-      Factions:
-    <ul>
-      <li ng-repeat="faction in city.factions">
-        {{faction}}
-      </li>
-    </ul>
+    <div ng-if="city">
+      <h3>{{city.name}}</h3>
+      <p>Nation: {{city.nation.name}}</p>
+      <p>Race: {{city.race}}</p>
+      <p>{{city.description}}</p>
+      <ul>
+        <li ng-repeat="feature in city.features">
+          {{feature}}
+        </li>
+      </ul>
+      <div ng-if="city.factions.length">
+        Factions:
+        <ul>
+        <li ng-repeat="faction in city.factions">
+          {{faction}}
+        </li>
+      </ul>
+      </div>
     </div>
   </div>
 </div>
