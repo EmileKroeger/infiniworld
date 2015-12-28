@@ -13,18 +13,6 @@ body {
   font-family: Symbola;
 }
 
-.cityname {
-  z-index: 200;
-  position: absolute;
-  top: 20px;
-  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-  color: grey;
-  margin-left: -50%;
-  display: inline-block;
-  white-space: nowrap;
-  transform: translate(-50%, 0px);
-}
-
 .surfacecell {
   padding: 0;
   margin: 0;
@@ -42,6 +30,28 @@ body {
   color: black;
   left: 0;
   top: 0;
+}
+
+.cityname {
+  z-index: 200;
+  position: absolute;
+  top: 20px;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  color: grey;
+  margin-left: -50%;
+  display: inline-block;
+  white-space: nowrap;
+  transform: translate(-50%, 0px);
+}
+
+.cityflag {
+  z-index: 200;
+  position: absolute;
+  top: -5px;
+  left: 10px;
+  width: 10px;
+  height: 7px;
+  border: 1px solid black;
 }
 
 .infobox {

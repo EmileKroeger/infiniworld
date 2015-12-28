@@ -54,14 +54,26 @@ angular.module('infiniworld')
 .service("sCultures", function(sField, sStringGen, sRandomUtils) {
   var NATIONKINDS = ["Kingdom", "Kingdom", "Empire", "Republic",
                      "Kingdom", "Kingdom", "Empire", "Republic",
-                     "Confederacy", "Grand-duchy"]
+                     "Confederacy", "Grand-duchy"];
   var RACES = ["Human", "Human", "Human", "Elf", "Elf", "Dwarf",
-               "Orc", "Goblin"]
+               "Orc", "Goblin"];
+  var HERALDIC_COLORS = ["red", "blue", "white", "black", "green", "yellow"];
+  var FLAG_PATTERNS = [
+    "linear-gradient(to right, COLA, COLA 50%, COLB 50%, COLB)",
+    "linear-gradient(to right, COLA, COLA 33%, COLB 33%, COLB 67%, COLA 67%, COLA)",
+  ];
   var keyField = sField.simpleMap(43);
   var raceKeyField = sField.simpleMap(87);
   var kindKeyField = sField.simpleMap(711);
   var nameKeyField = sField.simpleMap(817);
+  var colorKeyField = sField.simpleMap(17);
   var INFLUENCE_RANGE = 2;
+  this.makeColors = function(key) {
+    var pattern = sRandomUtils.pick(FLAG_PATTERNS, key);
+    var colA = sRandomUtils.pick(HERALDIC_COLORS, key * 2);
+    var colB = sRandomUtils.pick(HERALDIC_COLORS, key * 38);
+    return pattern.replace(/COLA/g, colA).replace(/COLB/g, colB);
+  }
   this.getCulture = function(i, j) {
     var culture = {};
     var key = keyField(i, j);
@@ -69,7 +81,10 @@ angular.module('infiniworld')
       // Nation! For now, simple.
       var kind = sRandomUtils.pick(NATIONKINDS, kindKeyField(i, j));
       var basename = sStringGen.townname(nameKeyField(i, j))
-      culture["nation"] = kind + " of " + basename;
+      culture["nation"] = {
+        name: kind + " of " + basename,
+        colors: this.makeColors(colorKeyField(i, j)),
+      }
       if (key > 0.85) {
         culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j))
       }
