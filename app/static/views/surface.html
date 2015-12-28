@@ -13,6 +13,8 @@
       ng-repeat="x in range(x0, x0 + 30)"
       ng-click="select(x, y);"
       class="col-xs-1 surfacecell"
+      world="world"
+      pos="{'x': x, 'y': y}"
       altitude="world.altitude(x, y)"
       population="world.population(x, y)"
       temperature="world.temperature(x, y)"

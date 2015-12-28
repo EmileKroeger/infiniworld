@@ -75,15 +75,15 @@ angular.module('infiniworld')
         return color;
       }
     }
-    var controller = function($scope, sBiomes) {
-      calculate($scope, sBiomes);
+    var controller = function($scope, sBiomes, sCities) {
+      calculate($scope, sBiomes, sCities);
       if ($scope.dynamic) {
         $scope.$watch("altitude", function() {
           // Hack assume altitude changes when we click
           // true 99.9% of the time, otherwise click elsewhere
-          calculate($scope, sBiomes);
+          calculate($scope, sBiomes, sCities);
         })
-      }
+      } 
       function updateSelected() {
         if ($scope.selected) {
           $scope.style.border = "1px solid red";
@@ -97,7 +97,7 @@ angular.module('infiniworld')
       updateSelected();
     }
 
-    var calculate = function($scope, sBiomes) {
+    var calculate = function($scope, sBiomes, sCities) {
       var biome = sBiomes.getBiome($scope);
       var glyph = "??";
       var style = {};
@@ -139,6 +139,9 @@ angular.module('infiniworld')
           }
         } else if (biome == "city") {
           // Some kind of habitation
+          if ($scope.world && $scope.pos) {
+            $scope.city = sCities.get($scope.world, $scope.pos);
+          }
           if ($scope.population > 0.98) {
             glyph = "♚";
             overglyph = "♔";
@@ -172,6 +175,8 @@ angular.module('infiniworld')
     }
     return {
       scope: {
+        world: '=world',
+        pos: '=pos',
         altitude: '=altitude',
         population: '=population',
         temperature: '=temperature',

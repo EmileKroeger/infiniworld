@@ -113,21 +113,27 @@ angular.module('infiniworld')
   };
 })
 .service("sCities", function(sField, sStringGen, sCultures) {
-  keyField = sField.simpleMap(117);
-  //RACES = ["human", "elf", "orc", "dwarf", "goblin"]
+  var keyField = sField.simpleMap(117);
+  var knownCities = {}
   this.get = function(world, pos) {
-    var key = keyField(pos.x, pos.y);
-    var city = {
-      nation: sCultures.getNation(pos),
-      name: sStringGen.townname(key),
-      race: sCultures.getRace(pos),
-    };
-    var descr = sStringGen.fantasyregion(key);
-    var head_tail = descr.split("<ul><li>");
-    city.description = head_tail[0];
-    city.features = head_tail[1].split("<li>");
-    city.factions = [sStringGen.faction(key)]
-    return city;
+    var posv = [pos.x, pos.y];
+    if (!knownCities[posv]) {
+      var key = keyField(pos.x, pos.y);
+      var city = {
+        nation: sCultures.getNation(pos),
+        name: sStringGen.townname(key),
+        race: sCultures.getRace(pos),
+      };
+      // All this is not necessary for 'map' cities, could be optimized
+      // away
+      var descr = sStringGen.fantasyregion(key);
+      var head_tail = descr.split("<ul><li>");
+      city.description = head_tail[0];
+      city.features = head_tail[1].split("<li>");
+      city.factions = [sStringGen.faction(key)]
+      knownCities[posv] = city;
+    }
+    return knownCities[posv];
   };
 })
 .service("sBiomes", function() {
