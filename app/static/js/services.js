@@ -145,37 +145,43 @@ angular.module('infiniworld')
     var key = keyField(i, j);
     if (key > 0.8) {
       // Nation! For now, simple.
-      culture["nation"] = this.makeNation(i, j)
+      culture["nation"] = this.makeNation(i, j);
       if (key > 0.85) {
-        culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j))
+        culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j));
       }
     }
     else if (key > 0.6) {
-      culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j))
+      culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j));
+    } else if (key > 0.5) {
+      culture["conspiracy"] = sStringGen.faction(raceKeyField(i, j));
     }
     // Also possible: religion, conspiracies, ancient empires
     culture.influence = 0.1 + key;
     return culture;
   });
-  this.getMostInfluent = function(pos, attribute) {
+  this.forEachCulture = function(pos, callback) {
     var i0 = Math.floor(pos.x / 8);
     var j0 = Math.floor(pos.y / 8);
-    var closestIDist = 100000000;
-    var mostInfluent = null;
     for (di = -INFLUENCE_RANGE; di <= INFLUENCE_RANGE; di++) {
       for (dj = -INFLUENCE_RANGE; dj <= INFLUENCE_RANGE; dj++) {
-        var culture = this.getCulture(i0 + di, j0 + dj);
-        if (culture[attribute]) {
-          var dist2 = di*di + dj*dj;
-          // This means even a culture with no influence will
-          // win at dist = 0
-          var iDist = dist2 / culture.influence;
-          if ((iDist < closestIDist) || (closestIDist == -1)) {
-            mostInfluent = culture[attribute];
-          }
-        }
+        var dist2 = di*di + dj*dj;
+        callback(this.getCulture(i0 + di, j0 + dj), dist2);
       }
     }
+  }
+  this.getMostInfluent = function(pos, attribute) {
+    var closestIDist = 100000000;
+    var mostInfluent = null;
+    this.forEachCulture(pos, function(culture, dist2) {
+      if (culture[attribute]) {
+        // This means even a culture with no influence will
+        // win at dist = 0
+        var iDist = dist2 / culture.influence;
+        if ((iDist < closestIDist) || (closestIDist == -1)) {
+          mostInfluent = culture[attribute];
+        }
+      }
+    });
     return mostInfluent;
   }
   
@@ -190,6 +196,17 @@ angular.module('infiniworld')
   this.getCityPopulation = function(pos) {
     // TODO
   };
+  this.getCityFactions = function(pos) {
+    // Who's up to what in a city?
+    var factions = []
+    this.forEachCulture(pos, function(culture, dist2) {
+      // TODO: maybe sort/vary according to influence?
+      if (culture.conspiracy) {
+        factions.push(culture.conspiracy)
+      }
+    });
+    return factions;
+  }
 })
 .service("sCities", function(sField, sStringGen, sCultures) {
   var keyField = sField.simpleMap(117);
@@ -212,7 +229,7 @@ angular.module('infiniworld')
       city.ruler = nation.getRulerDescription(pos.x, pos.y); 
       //head_tail[0];
       city.features = head_tail[1].split("<li>");
-      city.factions = [sStringGen.faction(key)]
+      city.factions = sCultures.getCityFactions(pos)
       knownCities[posv] = city;
     }
     return knownCities[posv];
