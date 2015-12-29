@@ -55,11 +55,28 @@ angular.module('infiniworld')
   };
 })
 .service("sCultures", function(sField, sStringGen, sRandomUtils) {
-  var NATIONKINDS = ["Kingdom", "Kingdom", "Empire", "Republic",
-                     "Kingdom", "Kingdom", "Empire", "Republic",
-                     "Confederacy", "Grand-duchy"];
-  var RACES = ["Human", "Human", "Human", "Elf", "Elf", "Dwarf",
-               "Orc", "Goblin"];
+  var NATIONKINDS = [
+    "Kingdom", "Kingdom", "Empire", "Republic",
+    "Kingdom", "Kingdom", "Empire", "Republic",
+    "Confederacy", "Grand-duchy"
+  ];
+  var NATIONCITIES = {
+    "Kingdom": ["A baronny", "A province", "A duchy"],
+    "Empire": ["A province", "A region"],
+    "Republic": ["A province"],
+    "Confederacy": ["A city-state"],
+    "Grand-duchy": ["A baronny"]
+  };
+  var NATIONRULERS = {
+    "Kingdom": ["a baron", "a duke", "a council of nobles"],
+    "Empire": ["a governor", "a consul", "a council", "a magistrate"],
+    "Republic": ["a governor", "a mayor", "a council"],
+    "Confederacy": ["a prince", "a council of nobles", "an archbishop"],
+    "Grand-duchy": ["a magistrate", "a mayor"]
+  };
+  var RACES = [
+    "Human", "Human", "Human", "Elf", "Elf", "Dwarf",
+    "Orc", "Goblin"];
   var COLOR_PAIRS = [
     ["red", "white"],
     ["red", "yellow"],
@@ -105,19 +122,30 @@ angular.module('infiniworld')
       colB = colors[0];
     }
     return pattern.replace(/COLA/g, colA).replace(/COLB/g, colB);
-  }
-  this.getCulture = function(i, j) {
+  };
+  this.makeNation = function(i, j) {
+    var kind = sRandomUtils.pick(NATIONKINDS, kindKeyField(i, j));
+    var basename = sStringGen.townname(nameKeyField(i, j));
+    return {
+      name: kind + " of " + basename,
+      maincolor: this.getMainColor(colorKeyField(i, j)),
+      colors: this.makeColors(colorKeyField(i, j)),
+      getCityDescription: function(x, y) {
+        var regionKind = sRandomUtils.pick(NATIONCITIES[kind],
+          nameKeyField(x, y));
+        return regionKind; // Basic, TODO: improve
+      },
+      getRulerDescription: function(x, y) {
+        return sRandomUtils.pick(NATIONRULERS[kind], nameKeyField(x, y) * 7);
+      },
+    };
+  };
+  this.getCulture = sField.memoize(function(i, j) {
     var culture = {};
     var key = keyField(i, j);
     if (key > 0.8) {
       // Nation! For now, simple.
-      var kind = sRandomUtils.pick(NATIONKINDS, kindKeyField(i, j));
-      var basename = sStringGen.townname(nameKeyField(i, j));
-      culture["nation"] = {
-        name: kind + " of " + basename,
-        maincolor: this.getMainColor(colorKeyField(i, j)),
-        colors: this.makeColors(colorKeyField(i, j)),
-      }
+      culture["nation"] = this.makeNation(i, j)
       if (key > 0.85) {
         culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j))
       }
@@ -128,7 +156,7 @@ angular.module('infiniworld')
     // Also possible: religion, conspiracies, ancient empires
     culture.influence = 0.1 + key;
     return culture;
-  }
+  });
   this.getMostInfluent = function(pos, attribute) {
     var i0 = Math.floor(pos.x / 8);
     var j0 = Math.floor(pos.y / 8);
@@ -159,6 +187,9 @@ angular.module('infiniworld')
     return this.getMostInfluent(pos, "race");
     // If no nation, it'll be a city-state.
   };
+  this.getCityPopulation = function(pos) {
+    // TODO
+  };
 })
 .service("sCities", function(sField, sStringGen, sCultures) {
   var keyField = sField.simpleMap(117);
@@ -167,8 +198,9 @@ angular.module('infiniworld')
     var posv = [pos.x, pos.y];
     if (!knownCities[posv]) {
       var key = keyField(pos.x, pos.y);
+      var nation = sCultures.getNation(pos);
       var city = {
-        nation: sCultures.getNation(pos),
+        nation: nation,
         name: sStringGen.townname(key),
         race: sCultures.getRace(pos),
       };
@@ -176,7 +208,9 @@ angular.module('infiniworld')
       // away
       var descr = sStringGen.fantasyregion(key);
       var head_tail = descr.split("<ul><li>");
-      city.description = head_tail[0];
+      city.description = nation.getCityDescription(pos.x, pos.y); 
+      city.ruler = nation.getRulerDescription(pos.x, pos.y); 
+      //head_tail[0];
       city.features = head_tail[1].split("<li>");
       city.factions = [sStringGen.faction(key)]
       knownCities[posv] = city;
