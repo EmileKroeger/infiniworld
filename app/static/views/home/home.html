@@ -8,5 +8,20 @@
 	            <a href="#/x/0/y/0/">Start here</a>
             </p>
         </div>
+        Sample infiniscroll:
+        <div style=" width: 500px; height: 500px; border: 2px solid red; overflow: hidden; position: relative; user-select: none; -webkit-user-select: none; -moz-user-select: none;" 
+        ng-style="{'cursor': dragging ? 'grabbing' : 'grab'}"
+        ng-mousedown="handleMouseDown($event);"
+        ng-mousemove="handleMouseMove($event);"
+        ng-mouseup="handleMouseUp($event);"
+        >
+          <div style="position: absolute;" ng-style="{'left': offset.left+'px', top: offset.top+'px'}">
+            <div ng-repeat="y in testrange">
+              <div ng-repeat="x in testrange" style="width: 100px; height: 100px; position: absolute; text-align: center; vertical-align: middle; line-height: 100px;" ng-style="{'background-color': getColor(x, y), 'left': 100*x+'px', top: 100*y+'px'}">
+                ({{x}}, {{y}})
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
 </div>
