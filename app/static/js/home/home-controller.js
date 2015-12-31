@@ -17,7 +17,6 @@ angular.module('infiniworld')
       if (this.dragging) {
         this.left = e.clientX - dragInit.x;
         this.top = e.clientY - dragInit.y;
-        console.log(this.left);
       }
     };
     this.handleMouseUp = function(e) {

@@ -36,13 +36,56 @@ angular.module('infiniworld')
       return knownCells[key];
     };
   })
-  .controller('SurfaceController', ['$scope', '$routeParams', 'sWorldModel', 'sStringGen',
-  function ($scope, $routeParams, sWorldModel, sStringGen) {
-    $scope.x0 = parseInt($routeParams.x);
-    $scope.y0 = parseInt($routeParams.y);
+  .controller('SurfaceController', ['$scope', '$routeParams', 'sWorldModel', 'sStringGen', 'sScrollControl', '$window',
+  function ($scope, $routeParams, sWorldModel, sStringGen, sScrollControl, $window) {
+    var x0 = parseInt($routeParams.x);
+    var y0 = parseInt($routeParams.y);
     $scope.loaded = false;
     sStringGen.load(function() {
       $scope.loaded = true;
+    });
+    
+    
+    var CHUNK_STEP = 8;
+    var CELL_WID = 20;
+    var CELL_HEI = 20;
+    
+    var halfScreenWidth = $window.innerWidth / 2;
+    var halfScreenHeight = $window.innerHeight / 2;
+    var halfHorizChunks = Math.floor(halfScreenWidth / (CHUNK_STEP * CELL_WID)) + 1;
+    var halfVertChunks = Math.floor(halfScreenHeight / (CHUNK_STEP * CELL_HEI)) + 1;
+    
+    $scope.chunks = [];
+    // TODO: take window into account
+    for (var di=-halfHorizChunks; di <= halfHorizChunks; di++) {
+      for (var dj=-halfVertChunks; dj < halfVertChunks; dj++) {
+        $scope.chunks.push({
+          x0: x0 + (di * CHUNK_STEP),
+          y0: y0 + (dj * CHUNK_STEP),
+          left: (CELL_WID * CHUNK_STEP * di) + halfScreenWidth,
+          top: (CELL_HEI * CHUNK_STEP * dj) + halfScreenHeight,
+        });
+      }
+    }
+    //console.debug($scope.chunks);
+    $scope.visiblePos = [];
+    $scope.chunks.forEach(function(chunk) {
+      for (var dx=0; dx < CHUNK_STEP; dx++) {
+        for (var dy=0; dy < CHUNK_STEP; dy++) {
+          var x = chunk.x0 + dx;
+          var y = chunk.y0 + dy;
+          var left = chunk.left + CELL_WID * dx;
+          var top  = chunk.top  + CELL_HEI * dy;
+          $scope.visiblePos.push({
+            x: x,
+            y: y,
+            style: {
+              "left": left + "px",
+              "top" : top + "px",
+            },
+          });
+        }
+      }
     });
 
 
@@ -61,7 +104,11 @@ angular.module('infiniworld')
     };
     
     $scope.world = sWorldModel;
+    
+    $scope.scroll = sScrollControl;
+    
 
+    // OLd buttons for navigation
     $scope.moveMap = function(dx, dy) {
       $scope.x0 += dx;
       $scope.y0 += dy;
@@ -89,8 +136,8 @@ angular.module('infiniworld')
     
     function evaluateDistrib(func) {
       var values = {};
-      for (y=0; y < 11; y++) {
-        for (x = 0; x < 20; x++) {
+      for (var y=0; y < 11; y++) {
+        for (var x = 0; x < 20; x++) {
           var alt = func(x, y);
           var bin = Math.floor(10*alt);
           if (values[bin] == undefined) {
@@ -99,7 +146,7 @@ angular.module('infiniworld')
           values[bin] += 1;
         }
       }
-      for (bin = 0; bin < 11; bin++) {
+      for (var bin = 0; bin < 11; bin++) {
         console.log([bin, values[bin]]);
       }
     }

@@ -1,6 +1,16 @@
+html, body {
+  height: 100%;
+}
+
+html, body, div {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
 body {
-  margin-top: 60px;
-  padding: 10px;
+  /*margin-top: 60px;
+  padding: 10px; */
   background-color: #ECF0F1;
 }
 
@@ -15,8 +25,9 @@ body {
   border: 1px solid black;
   background-color: grey;
   position: absolute;
-  top: 150px;
-  left: 750px;
+  top: 50px;
+  left: 20px;
+  z-index: 200;
 }
 
 .navarrow {
@@ -58,7 +69,7 @@ body {
 }
 
 .cityname {
-  z-index: 200;
+  z-index: 100;
   position: absolute;
   top: 20px;
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
@@ -69,7 +80,7 @@ body {
 }
 
 .cityflag {
-  z-index: 200;
+  z-index: 150;
   position: absolute;
   top: -5px;
   left: 10px;
