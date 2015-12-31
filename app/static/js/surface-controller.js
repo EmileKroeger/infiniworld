@@ -43,7 +43,7 @@ angular.module('infiniworld')
     $scope.loaded = false;
     sStringGen.load(function() {
       $scope.loaded = true;
-      updateVisibleChunks();
+      updateVisibleChunks(getChunkRect());
     });
 
     var CHUNK_STEP = 8;
@@ -82,64 +82,86 @@ angular.module('infiniworld')
       console.log(["rect", rect.x, rect.y, rect.wid, rect.hei]);
     }
     
-    $scope.chunks = [];
+    $scope.visibleChunks = [];
     $scope.visiblePos = [];
+    var knownChunks = {};
     
-    function updateVisibleChunks() {
+    var lastChunkRect = null;
+    function updateVisibleChunks(chunkRect) {
       var halfScreenWidth = $window.innerWidth / 2;
       var halfScreenHeight = $window.innerHeight / 2;
-      var halfHorizChunks = Math.floor(halfScreenWidth / (CHUNK_STEP * CELL_WID)) + 1;
-      var halfVertChunks = Math.floor(halfScreenHeight / (CHUNK_STEP * CELL_HEI)) + 1;
-    
-      $scope.chunks = [];
-      // TODO: update with time
-      for (var di=-halfHorizChunks; di <= halfHorizChunks; di++) {
-        for (var dj=-halfVertChunks; dj < halfVertChunks; dj++) {
+      
+      lastChunkRect = chunkRect;
+      // Clear visible chunks
+      $scope.visibleChunks = [];
+      for (var di=0; di <= chunkRect.wid; di++) {
+        for (var dj=0; dj < chunkRect.hei; dj++) {
           // VERY TEMP
           //if ((di + dj + 10000) % 2 == 1) {
           //  continue;
           //}
-          $scope.chunks.push({
-            x0: x0 + (di * CHUNK_STEP),
-            y0: y0 + (dj * CHUNK_STEP),
-            left: (CELL_WID * CHUNK_STEP * di) + halfScreenWidth,
-            top: (CELL_HEI * CHUNK_STEP * dj) + halfScreenHeight,
-          });
+          var ckey = [chunkRect.x + di, chunkRect.y + dj];
+          if (!knownChunks[ckey]) {
+            var chunk = {
+              x0: (chunkRect.x + di) * CHUNK_STEP,
+              y0: (chunkRect.y + dj) * CHUNK_STEP,
+              left: (CELL_WID * CHUNK_STEP * di),
+              top: (CELL_HEI * CHUNK_STEP * dj),
+              cells: [],
+            };
+            for (var dx=0; dx < CHUNK_STEP; dx++) {
+              for (var dy=0; dy < CHUNK_STEP; dy++) {
+                var x = chunk.x0 + dx;
+                var y = chunk.y0 + dy;
+                var left = chunk.left + CELL_WID * dx;
+                var top  = chunk.top  + CELL_HEI * dy;
+                var cell = {
+                  x: x,
+                  y: y,
+                  altitude:    sWorldModel.altitude(x, y),
+                  population:  sWorldModel.population(x, y),
+                  temperature: sWorldModel.temperature(x, y),
+                  humidity:    sWorldModel.humidity(x, y),
+                  style: {
+                    "left": left + "px",
+                    "top" : top + "px",
+                  },
+                };
+                chunk.cells.push(cell);
+              }
+            }
+            knownChunks[ckey] = chunk;
+          }
+          $scope.visibleChunks.push(knownChunks[ckey]);
         }
       }
       // Now for each chunk, update the tiles.
       // Why am I keeping chunks? So that it's easier to keep track of
       // who I already loaded, something like that.
-      $scope.chunks.forEach(function(chunk) {
-        for (var dx=0; dx < CHUNK_STEP; dx++) {
-          for (var dy=0; dy < CHUNK_STEP; dy++) {
-            var x = chunk.x0 + dx;
-            var y = chunk.y0 + dy;
-            var left = chunk.left + CELL_WID * dx;
-            var top  = chunk.top  + CELL_HEI * dy;
-            $scope.visiblePos.push({
-              x: x,
-              y: y,
-              altitude:    sWorldModel.altitude(x, y),
-              population:  sWorldModel.population(x, y),
-              temperature: sWorldModel.temperature(x, y),
-              humidity:    sWorldModel.humidity(x, y),
-              style: {
-                "left": left + "px",
-                "top" : top + "px",
-              },
-            });
-          }
-        }
+      $scope.visiblePos.length = 0;
+      $scope.visibleChunks.forEach(function(chunk) {
+        // I might want to iterate over chunks in view
+        Array.prototype.push.apply($scope.visiblePos, chunk.cells);
+        //$scope.visiblePos += chunk.cells;
       });
+    }
+    
+    function getChunkRect() {
+      var visible = getVisiblePixelRect()
+      return getContainingRect(visible, CELL_WID * CHUNK_STEP);
     }
     
     sScrollControl.onMoved( function (){
       // TODO: recalculate if new chunks are needed.
-      var visible = getVisiblePixelRect()
+      //var visible = getVisiblePixelRect()
       //console.debug();
       //printRect(visible);
-      printRect(getContainingRect(visible, CELL_WID * CHUNK_STEP));
+      //printRect(getContainingRect(visible, CELL_WID * CHUNK_STEP));
+      var chunkRect = getChunkRect();
+      if (!compareRects(chunkRect, lastChunkRect)) {
+        printRect(chunkRect); // DEBUG
+        updateVisibleChunks(chunkRect);
+      }
     });
 
     // Probably not needed...

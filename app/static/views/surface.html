@@ -19,7 +19,7 @@
 
   <div class="scrollablemap" ng-style="{'left': scroll.left+'px', top: scroll.top+'px'}">
 
-  <div ng-repeat="chunk in chunks"
+  <div ng-repeat="chunk in visibleChunks"
     style = "z-index: 500; position: absolute; background-color: grey;"
     ng-style="{'left': chunk.left, 'top': chunk.top}"
   >
