@@ -8,15 +8,14 @@
 	            <a href="#/x/0/y/0/">Start here</a>
             </p>
         </div>
-        Sample infiniscroll:
         <div style="width: 500px; height: 500px; border: 2px solid red;"
         class="mapframe" 
-        ng-style="{'cursor': dragging ? 'grabbing' : 'grab'}"
-        ng-mousedown="handleMouseDown($event);"
-        ng-mousemove="handleMouseMove($event);"
-        ng-mouseup="handleMouseUp($event);"
+        ng-style="{'cursor': scroll.dragging ? 'grabbing' : 'grab'}"
+        ng-mousedown="scroll.handleMouseDown($event);"
+        ng-mousemove="scroll.handleMouseMove($event);"
+        ng-mouseup="scroll.handleMouseUp($event);"
         >
-          <div style="position: absolute;" ng-style="{'left': offset.left+'px', top: offset.top+'px'}">
+          <div class="scrollablemap" ng-style="{'left': scroll.left+'px', top: scroll.top+'px'}">
             <div ng-repeat="y in testrange">
               <div ng-repeat="x in testrange" style="width: 100px; height: 100px; position: absolute; text-align: center; vertical-align: middle; line-height: 100px;" ng-style="{'background-color': getColor(x, y), 'left': 100*x+'px', top: 100*y+'px'}">
                 ({{x}}, {{y}})

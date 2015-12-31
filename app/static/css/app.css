@@ -24,12 +24,16 @@ body {
 }
 
 .mapframe {
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.scrollablemap {
+  position: absolute;
 }
 
 /* Generic map elements */
