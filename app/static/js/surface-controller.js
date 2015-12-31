@@ -79,6 +79,10 @@ angular.module('infiniworld')
           $scope.visiblePos.push({
             x: x,
             y: y,
+            altitude:    sWorldModel.altitude(x, y),
+            population:  sWorldModel.population(x, y),
+            temperature: sWorldModel.temperature(x, y),
+            humidity:    sWorldModel.humidity(x, y),
             style: {
               "left": left + "px",
               "top" : top + "px",
