@@ -1,15 +1,31 @@
-  <div class="infobox col-md-3" infiniworld-cell-info pos="selectedPos" world="world" cell="world.getCell(selectedPos)">
+<div
+  ng-if="loaded"
+  class="infobox col-md-3"
+  infiniworld-cell-info pos="selectedPos" world="world" cell="world.getCell(selectedPos)"
+  >
+</div>
+
+<div
+ style="width: 100%; height: 100%;"
+ class="mapframe" 
+ ng-if="loaded"
+ ng-style="{'cursor': scroll.dragging ? 'grabbing' : 'grab'}"
+ ng-mousedown="scroll.handleMouseDown($event);"
+ ng-mousemove="scroll.handleMouseMove($event);"
+ ng-mouseup="scroll.handleMouseUp($event);"
+ >
+ <!-- 
+   -->
+
+  <div class="scrollablemap" ng-style="{'left': scroll.left+'px', top: scroll.top+'px'}">
+
+  <div ng-repeat="chunk in chunks"
+    style = "z-index: 500; position: absolute; background-color: grey;"
+    ng-style="{'left': chunk.left, 'top': chunk.top}"
+  >
+    {{chunk.x0 / 8}}<br>{{chunk.y0 / 8}}
   </div>
 
-<div style="width: 100%; height: 100%; border: 2px solid red;"
-class="mapframe" 
-ng-if="loaded"
-ng-style="{'cursor': scroll.dragging ? 'grabbing' : 'grab'}"
-ng-mousedown="scroll.handleMouseDown($event);"
-ng-mousemove="scroll.handleMouseMove($event);"
-ng-mouseup="scroll.handleMouseUp($event);"
->
-  <div class="scrollablemap" ng-style="{'left': scroll.left+'px', top: scroll.top+'px'}">
   <div ng-repeat="pos in visiblePos"
     infiniworld-cell
     style="position: absolute;"

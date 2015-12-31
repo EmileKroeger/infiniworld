@@ -35,6 +35,10 @@ angular.module('infiniworld')
     });
   };
   this.generate = function(source, name, key) {
+    if (!this.data[source]) {
+      console.debug(["ERROR", source, name, key]);
+      return "ERROR"
+    }
     return sRandomUtils.build(this.data[source], name, key);
   };
   this.townname = function(key) {

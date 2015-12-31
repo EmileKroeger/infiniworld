@@ -43,56 +43,106 @@ angular.module('infiniworld')
     $scope.loaded = false;
     sStringGen.load(function() {
       $scope.loaded = true;
+      updateVisibleChunks();
     });
-    
-    
+
     var CHUNK_STEP = 8;
     var CELL_WID = 20;
     var CELL_HEI = 20;
     
-    var halfScreenWidth = $window.innerWidth / 2;
-    var halfScreenHeight = $window.innerHeight / 2;
-    var halfHorizChunks = Math.floor(halfScreenWidth / (CHUNK_STEP * CELL_WID)) + 1;
-    var halfVertChunks = Math.floor(halfScreenHeight / (CHUNK_STEP * CELL_HEI)) + 1;
+    /// utility, can be isolated:
+    function compareRects(rA, rB) {
+      return (rA.x == rB.x) && (rA.y == rB.y) &&
+             (rA.wid == rB.wid) && (rA.hei == rB.hei);
+    }
+    
+    function getVisiblePixelRect() {
+      var halfScreenWidth = $window.innerWidth / 2;
+      var halfScreenHeight = $window.innerHeight / 2;
+      return {
+        x: (x0 * CELL_WID - halfScreenWidth - sScrollControl.left),
+        y: (y0 * CELL_WID - halfScreenHeight - sScrollControl.top),
+        wid: $window.innerWidth,
+        hei: $window.innerHeight,
+      };
+    }
+    
+    function getContainingRect(innerRect, scale) {
+      var x = Math.floor(innerRect.x / scale);
+      var y = Math.floor(innerRect.y / scale);
+      return {
+        x: x,
+        y: y,
+        wid: Math.ceil((scale * x + innerRect.wid) / scale) - x,
+        hei: Math.ceil((scale * y + innerRect.hei) / scale) - y,
+      };
+    }
+    
+    function printRect(rect) {
+      console.log(["rect", rect.x, rect.y, rect.wid, rect.hei]);
+    }
     
     $scope.chunks = [];
-    // TODO: take window into account
-    for (var di=-halfHorizChunks; di <= halfHorizChunks; di++) {
-      for (var dj=-halfVertChunks; dj < halfVertChunks; dj++) {
-        $scope.chunks.push({
-          x0: x0 + (di * CHUNK_STEP),
-          y0: y0 + (dj * CHUNK_STEP),
-          left: (CELL_WID * CHUNK_STEP * di) + halfScreenWidth,
-          top: (CELL_HEI * CHUNK_STEP * dj) + halfScreenHeight,
-        });
-      }
-    }
-    //console.debug($scope.chunks);
     $scope.visiblePos = [];
-    $scope.chunks.forEach(function(chunk) {
-      for (var dx=0; dx < CHUNK_STEP; dx++) {
-        for (var dy=0; dy < CHUNK_STEP; dy++) {
-          var x = chunk.x0 + dx;
-          var y = chunk.y0 + dy;
-          var left = chunk.left + CELL_WID * dx;
-          var top  = chunk.top  + CELL_HEI * dy;
-          $scope.visiblePos.push({
-            x: x,
-            y: y,
-            altitude:    sWorldModel.altitude(x, y),
-            population:  sWorldModel.population(x, y),
-            temperature: sWorldModel.temperature(x, y),
-            humidity:    sWorldModel.humidity(x, y),
-            style: {
-              "left": left + "px",
-              "top" : top + "px",
-            },
+    
+    function updateVisibleChunks() {
+      var halfScreenWidth = $window.innerWidth / 2;
+      var halfScreenHeight = $window.innerHeight / 2;
+      var halfHorizChunks = Math.floor(halfScreenWidth / (CHUNK_STEP * CELL_WID)) + 1;
+      var halfVertChunks = Math.floor(halfScreenHeight / (CHUNK_STEP * CELL_HEI)) + 1;
+    
+      $scope.chunks = [];
+      // TODO: update with time
+      for (var di=-halfHorizChunks; di <= halfHorizChunks; di++) {
+        for (var dj=-halfVertChunks; dj < halfVertChunks; dj++) {
+          // VERY TEMP
+          //if ((di + dj + 10000) % 2 == 1) {
+          //  continue;
+          //}
+          $scope.chunks.push({
+            x0: x0 + (di * CHUNK_STEP),
+            y0: y0 + (dj * CHUNK_STEP),
+            left: (CELL_WID * CHUNK_STEP * di) + halfScreenWidth,
+            top: (CELL_HEI * CHUNK_STEP * dj) + halfScreenHeight,
           });
         }
       }
+      // Now for each chunk, update the tiles.
+      // Why am I keeping chunks? So that it's easier to keep track of
+      // who I already loaded, something like that.
+      $scope.chunks.forEach(function(chunk) {
+        for (var dx=0; dx < CHUNK_STEP; dx++) {
+          for (var dy=0; dy < CHUNK_STEP; dy++) {
+            var x = chunk.x0 + dx;
+            var y = chunk.y0 + dy;
+            var left = chunk.left + CELL_WID * dx;
+            var top  = chunk.top  + CELL_HEI * dy;
+            $scope.visiblePos.push({
+              x: x,
+              y: y,
+              altitude:    sWorldModel.altitude(x, y),
+              population:  sWorldModel.population(x, y),
+              temperature: sWorldModel.temperature(x, y),
+              humidity:    sWorldModel.humidity(x, y),
+              style: {
+                "left": left + "px",
+                "top" : top + "px",
+              },
+            });
+          }
+        }
+      });
+    }
+    
+    sScrollControl.onMoved( function (){
+      // TODO: recalculate if new chunks are needed.
+      var visible = getVisiblePixelRect()
+      //console.debug();
+      //printRect(visible);
+      printRect(getContainingRect(visible, CELL_WID * CHUNK_STEP));
     });
 
-
+    // Probably not needed...
     $scope.range = function(min, max, step) {
         step = step || 1;
         var input = [];
@@ -102,7 +152,7 @@ angular.module('infiniworld')
         return input;
     };
     // Cell selection handling
-    $scope.selectedPos = {'x': $scope.x0, 'y': $scope.y0};
+    $scope.selectedPos = {'x': x0, 'y': y0};
     $scope.select = function(x, y) {
       $scope.selectedPos = {'x': x, 'y': y};
     };
