@@ -86,8 +86,16 @@ angular.module('infiniworld')
     $scope.visiblePos = [];
     var knownChunks = {};
     
+    var firstChunkRect = null;
     var lastChunkRect = null;
     function updateVisibleChunks(chunkRect) {
+      if (!firstChunkRect) {
+        firstChunkRect = chunkRect;
+      }
+      // Ugly hack, there seems to be a calculation error, the
+      // -1 fixes it but it's not clear why.
+      var deltaX = chunkRect.x - firstChunkRect.x - 1; // TEST?
+      var deltaY = chunkRect.y - firstChunkRect.y;
       var halfScreenWidth = $window.innerWidth / 2;
       var halfScreenHeight = $window.innerHeight / 2;
       
@@ -96,17 +104,13 @@ angular.module('infiniworld')
       $scope.visibleChunks = [];
       for (var di=0; di <= chunkRect.wid; di++) {
         for (var dj=0; dj < chunkRect.hei; dj++) {
-          // VERY TEMP
-          //if ((di + dj + 10000) % 2 == 1) {
-          //  continue;
-          //}
           var ckey = [chunkRect.x + di, chunkRect.y + dj];
           if (!knownChunks[ckey]) {
             var chunk = {
               x0: (chunkRect.x + di) * CHUNK_STEP,
               y0: (chunkRect.y + dj) * CHUNK_STEP,
-              left: (CELL_WID * CHUNK_STEP * di),
-              top: (CELL_HEI * CHUNK_STEP * dj),
+              left: (CELL_WID * CHUNK_STEP * (deltaX + di)),
+              top: (CELL_HEI * CHUNK_STEP * (deltaY + dj)),
               cells: [],
             };
             for (var dx=0; dx < CHUNK_STEP; dx++) {
@@ -142,24 +146,19 @@ angular.module('infiniworld')
       $scope.visibleChunks.forEach(function(chunk) {
         // I might want to iterate over chunks in view
         Array.prototype.push.apply($scope.visiblePos, chunk.cells);
-        //$scope.visiblePos += chunk.cells;
       });
     }
     
     function getChunkRect() {
       var visible = getVisiblePixelRect()
-      return getContainingRect(visible, CELL_WID * CHUNK_STEP);
+      var rect = getContainingRect(visible, CELL_WID * CHUNK_STEP);
+      return rect;
     }
     
     sScrollControl.onMoved( function (){
-      // TODO: recalculate if new chunks are needed.
-      //var visible = getVisiblePixelRect()
-      //console.debug();
-      //printRect(visible);
-      //printRect(getContainingRect(visible, CELL_WID * CHUNK_STEP));
+      // Recalculate if new chunks are needed.
       var chunkRect = getChunkRect();
       if (!compareRects(chunkRect, lastChunkRect)) {
-        printRect(chunkRect); // DEBUG
         updateVisibleChunks(chunkRect);
       }
     });
