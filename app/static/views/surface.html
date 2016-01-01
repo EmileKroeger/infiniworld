@@ -15,7 +15,7 @@
  ng-mouseup="scroll.handleMouseUp($event);"
  >
 
-  <div class="scrollablemap" ng-style="{'left': scroll.left+'px', top: scroll.top+'px'}">
+ <div class="scrollablemap" ng-style="{'left': scroll.left+'px', top: scroll.top+'px'}">
 
  <!-- 
   <div ng-repeat="chunk in visibleChunks"
@@ -25,22 +25,28 @@
     {{chunk.x0 / 8}}<br>{{chunk.y0 / 8}}
   </div>
    -->
+ <div class="cellselection"
+   style="border: 2px dashed white; z-index: 150; position: absolute; width: 20px; height: 20px"
+   ng-style="selectedstyle"
+   >
+ </div>
 
-  <div ng-repeat="pos in visiblePos"
+ <div ng-repeat="chunk in visibleChunks">
+  <div ng-repeat="cell in chunk.cells"
     infiniworld-cell
     style="position: absolute;"
-    ng-style="pos.style"
-    ng-click="select(pos.x, pos.y);"
+    ng-style="cell.style"
+    ng-click="select(cell.x, cell.y);"
     class="col-xs-1 surfacecell"
     world="world"
-    pos="{'x': pos.x, 'y': pos.y}"
-    altitude="pos.altitude"
-    population="pos.population"
-    temperature="pos.temperature"
-    humidity="pos.humidity"
-    selected="(selectedPos.x == pos.x) && (selectedPos.y == pos.y)"
+    pos="{'x': cell.x, 'y': cell.y}"
+    altitude="cell.altitude"
+    population="cell.population"
+    temperature="cell.temperature"
+    humidity="cell.humidity"
     dynamic="false"
     >
   </div>
+ </div>
 </div>
 </div>

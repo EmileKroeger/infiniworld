@@ -84,17 +84,6 @@ angular.module('infiniworld')
           calculate($scope, sBiomes, sCities);
         })
       } 
-      function updateSelected() {
-        if ($scope.selected) {
-          $scope.style.border = "1px solid red";
-          $scope.style["line-height"] = "18px";
-        } else {
-          $scope.style.border = "";
-          $scope.style["line-height"] = "20px";
-        }
-      }
-      $scope.$watch("selected", updateSelected);
-      updateSelected();
     }
 
     var calculate = function($scope, sBiomes, sCities) {

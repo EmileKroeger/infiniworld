@@ -83,7 +83,6 @@ angular.module('infiniworld')
     }
     
     $scope.visibleChunks = [];
-    $scope.visiblePos = [];
     var knownChunks = {};
     
     var firstChunkRect = null;
@@ -139,14 +138,6 @@ angular.module('infiniworld')
           $scope.visibleChunks.push(knownChunks[ckey]);
         }
       }
-      // Now for each chunk, update the tiles.
-      // Why am I keeping chunks? So that it's easier to keep track of
-      // who I already loaded, something like that.
-      $scope.visiblePos.length = 0;
-      $scope.visibleChunks.forEach(function(chunk) {
-        // I might want to iterate over chunks in view
-        Array.prototype.push.apply($scope.visiblePos, chunk.cells);
-      });
     }
     
     function getChunkRect() {
@@ -174,8 +165,21 @@ angular.module('infiniworld')
     };
     // Cell selection handling
     $scope.selectedPos = {'x': x0, 'y': y0};
+    $scope.selectedstyle = {visibility: "hidden"};
     $scope.select = function(x, y) {
       $scope.selectedPos = {'x': x, 'y': y};
+      if (firstChunkRect) {
+        
+        var deltaX = -CHUNK_STEP * (firstChunkRect.x + 1); //magic number
+        var deltaY = -CHUNK_STEP * firstChunkRect.y;
+        
+        var left = (x + deltaX) * CELL_WID;
+        var top  = (y + deltaY) * CELL_HEI;
+        $scope.selectedstyle = {
+          'left': left + "px",
+          'top': top + "px",
+        };
+      }
     };
     
     $scope.world = sWorldModel;
