@@ -118,6 +118,24 @@
     "of the metals that are mined here", 
     "of the vile disease that all if its inhabitants suffer from"
   ], 
+  "CityQuality": [
+    "a great hero came from this land", 
+    "a great hero performed mighty deeds in this land", 
+    "a miracle happened here, and many devout people visit on pilgrimage", 
+    "a terrible battle happened here", 
+    "a well-known craftsman practices here", 
+    "a well-known holy person lives here", 
+    "an infamous villain lives here", 
+    "it is a place of uncanny magical occurrences", 
+    "it is very ancient, and built in the ruins of a lost civilization", 
+    "its impregnable defenses", 
+    "of a giant statue whose form dominates the landscape", 
+    "of a large festival that happens here every year", 
+    "of its amazing hanging gardens", 
+    "of its beautiful temple", 
+    "of the cloth that is woven here", 
+    "of the vile disease that all if its inhabitants suffer from"
+  ], 
   "Laws": [
     "almost nonexistent", 
     "favorable to one class of citizens over another", 
@@ -313,13 +331,13 @@
     "an unwed"
   ], 
   "main": [
-    "[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."
+    "The people of this city are [CitizenQuality].<li>The city is famous because [CityQuality]."
   ], 
   "main_old": [
     "[Display]<li>It is ruled by [Ruler].<li>[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."
   ], 
   "main2": [
-    "The people of this domain are [CitizenQuality]", 
+    "The people of this city are [CitizenQuality]", 
     "This domain gives a strong sense of being [LandPersonality]", 
     "The people of this domain are [CitizenQuality].<li>This domain gives a strong sense of being [LandPersonality]"
   ]

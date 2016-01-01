@@ -176,7 +176,6 @@ angular.module('infiniworld')
       controller: controller,
       templateUrl: function(elem, attrs) {
         if (attrs.dynamic == "true") {
-          console.debug(attrs.dynamic);
           return 'templates/dynamiccell.html';
         } else {
           return 'templates/surfacecell.html';
