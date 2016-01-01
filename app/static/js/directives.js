@@ -174,6 +174,13 @@ angular.module('infiniworld')
         selected: '=selected',
       },
       controller: controller,
-      templateUrl: 'templates/surfacecell.html',
+      templateUrl: function(elem, attrs) {
+        if (attrs.dynamic == "true") {
+          console.debug(attrs.dynamic);
+          return 'templates/dynamiccell.html';
+        } else {
+          return 'templates/surfacecell.html';
+        }
+      },
     };
   }) 

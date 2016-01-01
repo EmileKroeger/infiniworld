@@ -21,13 +21,16 @@
     
     <div ng-if="city">
       <h3>{{city.name}}</h3>
-      <p>Nation: {{city.nation.name}}</p>
-      <p>Race: {{city.race}}</p>
+      <p>In the {{city.nation.name}}</p>
       <p>{{city.description}}, ruled by {{city.ruler}}.</p>
       <ul>
         <li ng-repeat="feature in city.features">
           {{feature}}
         </li>
+      </ul>
+      <p>Population</p>
+      <ul>
+        <li>{{city.race}}</li>
       </ul>
       <div ng-if="city.factions.length">
         Factions:

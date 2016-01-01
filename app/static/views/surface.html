@@ -35,16 +35,16 @@
   <div ng-repeat="cell in chunk.cells"
     infiniworld-cell
     style="position: absolute;"
-    ng-style="cell.style"
+    ng-style="::cell.style"
     ng-click="select(cell.x, cell.y);"
     class="col-xs-1 surfacecell"
-    world="world"
-    pos="{'x': cell.x, 'y': cell.y}"
-    altitude="cell.altitude"
-    population="cell.population"
-    temperature="cell.temperature"
-    humidity="cell.humidity"
-    dynamic="false"
+    world="::world"
+    pos="::{'x': cell.x, 'y': cell.y}"
+    altitude="::cell.altitude"
+    population="::cell.population"
+    temperature="::cell.temperature"
+    humidity="::cell.humidity"
+    dynamic="::false"
     >
   </div>
  </div>

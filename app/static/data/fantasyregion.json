@@ -40,7 +40,7 @@
     "violent"
   ], 
   "Display": [
-    "A [NationQuality] [NationType] [NationPlace].<ul>"
+    "A [NationQuality] [NationType] [NationPlace]."
   ], 
   "LandPersonality": [
     "a place of deep mystery", 
@@ -313,6 +313,9 @@
     "an unwed"
   ], 
   "main": [
+    "[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."
+  ], 
+  "main_old": [
     "[Display]<li>It is ruled by [Ruler].<li>[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."
   ], 
   "main2": [

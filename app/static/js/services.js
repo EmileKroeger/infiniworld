@@ -227,12 +227,10 @@ angular.module('infiniworld')
       };
       // All this is not necessary for 'map' cities, could be optimized
       // away
-      var descr = sStringGen.fantasyregion(key);
-      var head_tail = descr.split("<ul><li>");
       city.description = nation.getCityDescription(pos.x, pos.y); 
       city.ruler = nation.getRulerDescription(pos.x, pos.y); 
-      //head_tail[0];
-      city.features = head_tail[1].split("<li>");
+      var features = sStringGen.fantasyregion(key);
+      city.features = features.split("<li>");
       city.factions = sCultures.getCityFactions(pos)
       knownCities[posv] = city;
     }
