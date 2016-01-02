@@ -20,7 +20,7 @@
 
       -->
 
-    <div ng-if="city && city.nation" class="infobox">
+    <div ng-if="nation" class="infobox">
       <h4 ng-style="{'color': city.nation.maincolor}">
         {{city.nation.name}}
       </h4>
@@ -29,9 +29,9 @@
         ng-style="{'background': city.nation.colors}"
         >
       </div>
-      <div>{{nationdesc}}</div>
+      <div>{{nation.blurb}}</div>
       <ul>
-        <li ng-repeat="feature in nationfeatures">
+        <li ng-repeat="feature in nation.features">
           {{feature}}
         </li>
       </ul>

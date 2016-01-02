@@ -1,16 +1,18 @@
 angular.module('infiniworld')
   .directive("infiniworldCellInfo", function() {
-    var controller = function($scope, sBiomes, sCities) {
+    var controller = function($scope, sBiomes, sCities, sNations) {
       var refresh = function() {
         $scope.biome = sBiomes.getBiome($scope.cell);
         if ($scope.biome == "city") {
           $scope.city = sCities.getDetailed($scope.world, $scope.pos);
-          $scope.nationdesc = sCities.getNationDesc($scope.city.nation);
-          $scope.nationfeatures = sCities.getNationFeatures($scope.city.nation);
+          $scope.nation = sNations.getDetailed($scope.world, $scope.city.nation);
+          //$scope.nationdesc = sCities.getNationDesc($scope.city.nation);
+          //$scope.nationfeatures = sCities.getNationFeatures($scope.city.nation);
         } else {
           $scope.city = null;
-          $scope.nationdesc = null;
-          $scope.nationfeatures = [];
+          $scope.nation = null;
+          //$scope.nationdesc = null;
+          //$scope.nationfeatures = [];
         }
       };
       $scope.$watch("pos", function() {

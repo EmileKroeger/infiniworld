@@ -204,31 +204,68 @@ angular.module('infiniworld')
 })
 .service("sFeatures", function(sField, sStringGen, sCultures) {
   var getters = {};
+
+  // Features
   this.CITYNAME = 117;
   getters[this.CITYNAME] = function(pos, key) {
     return sStringGen.townname(key);
-  }
-  var fieldIds = [this.CITYNAME];
+  };
+
+  this.CITYRULER = 119;
+  getters[this.CITYRULER] = function(pos, key) {
+    var nation = sCultures.getNation(pos);
+    return nation.getRulerDescription(pos.x, pos.y); 
+  };
+
+  this.NATIONBLURB = 811;
+  getters[this.NATIONBLURB] = function(pos, key) {
+    return sStringGen.getNationDesc(key);
+  };
+
+  this.NATIONFEATURES = 201;
+  getters[this.NATIONFEATURES] = function(pos, key) {
+    return sStringGen.getNationFeatures(key);
+  };
+
+  // Utility
+  var fieldIds = [this.CITYNAME, this.CITYRULER, this.NATIONBLURB,
+    this.NATIONFEATURES];
   var fields = {};
   fieldIds.forEach(function(fieldId) {
     fields[fieldId] = sField.simpleMap(fieldId)
   });
+  
+  // Access API
   this.get = function(fieldId, pos) {
     // actually, if I'm just using this as a random key a hash would be 
     // cheaper.
     var key = fields[fieldId](pos.x, pos.y);
+    if (!getters[fieldId]) {
+      console.debug(["ERROR", fieldId]);
+    }
     return getters[fieldId](pos, key);
   }
 })
+.service("sNations", function(sCultures, sFeatures) {
+  this.getDetailed = function(world, basicNation) {
+    var pos = {x: basicNation.i, y: basicNation.j};
+    return {
+      blurb: sFeatures.get(sFeatures.NATIONBLURB, pos),
+      features: sFeatures.get(sFeatures.NATIONFEATURES, pos),
+    };
+  };
+})
 .service("sCities", function(sField, sStringGen, sCultures, sFeatures) {
   var keyField = sField.simpleMap(117);
-  var knownCities = {}
+  var knownCities = {};
+  // Used for world map
   this.getBasic = function(world, pos) {
     return {
       nation: sCultures.getNation(pos),
       name: sFeatures.get(sFeatures.CITYNAME, pos),
     };
   };
+  // Used for detailed view, when selected
   this.getDetailed = function(world, pos) {
     var posv = [pos.x, pos.y];
     if (!knownCities[posv]) {
@@ -237,7 +274,8 @@ angular.module('infiniworld')
       var city = angular.extend({}, this.getBasic(world, pos));
       city.race = sCultures.getRace(pos);
       city.description = city.nation.getCityDescription(pos.x, pos.y); 
-      city.ruler = city.nation.getRulerDescription(pos.x, pos.y); 
+      city.ruler = sFeatures.get(sFeatures.CITYRULER, pos);
+      //city.ruler = city.nation.getRulerDescription(pos.x, pos.y); 
       var features = sStringGen.fantasyregion(key);
       city.features = features.split("<li>");
       city.factions = sCultures.getCityFactions(pos)
@@ -245,14 +283,4 @@ angular.module('infiniworld')
     }
     return knownCities[posv];
   };
-  var destKeyField = sField.simpleMap(811);
-  var featKeyField = sField.simpleMap(201);
-  this.getNationDesc = function(nation) {
-    var key = destKeyField(nation.i, nation.j);
-    return sStringGen.getNationDesc(key);
-  };
-  this.getNationFeatures = function(nation) {
-    var key = featKeyField(nation.i, nation.j);
-    return sStringGen.getNationFeatures(key);
-  };
-})
+});
