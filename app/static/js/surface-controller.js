@@ -85,61 +85,75 @@ angular.module('infiniworld')
     $scope.visibleChunks = [];
     var knownChunks = {};
     
+    var neededChunks = [];
+    
+    function makeChunk(i, j) {
+      var chunk = {
+        x0: i * CHUNK_STEP,
+        y0: j * CHUNK_STEP,
+        left: (CELL_WID * CHUNK_STEP * (i - firstChunkRect.x - 1)),
+        top: (CELL_HEI * CHUNK_STEP * (j - firstChunkRect.y)),
+        cells: [],
+      };
+      for (var dx=0; dx < CHUNK_STEP; dx++) {
+        for (var dy=0; dy < CHUNK_STEP; dy++) {
+          var x = chunk.x0 + dx;
+          var y = chunk.y0 + dy;
+          var left = chunk.left + CELL_WID * dx;
+          var top  = chunk.top  + CELL_HEI * dy + 10*(x % 2);
+          //For cheap hexagonal: + 10*(x % 2);
+          var cell = {
+            x: x,
+            y: y,
+            altitude:    sWorldModel.altitude(x, y),
+            population:  sWorldModel.population(x, y),
+            temperature: sWorldModel.temperature(x, y),
+            humidity:    sWorldModel.humidity(x, y),
+            style: {
+              "left": left + "px",
+              "top" : top + "px",
+            },
+          };
+          chunk.cells.push(cell);
+        }
+      }
+      return chunk;
+    }
+    
     var firstChunkRect = null;
     var lastChunkRect = null;
     function updateVisibleChunks(chunkRect) {
       if (!firstChunkRect) {
         firstChunkRect = chunkRect;
       }
-      // Ugly hack, there seems to be a calculation error, the
-      // -1 fixes it but it's not clear why.
-      var deltaX = chunkRect.x - firstChunkRect.x - 1; // TEST?
-      var deltaY = chunkRect.y - firstChunkRect.y;
-      var halfScreenWidth = $window.innerWidth / 2;
-      var halfScreenHeight = $window.innerHeight / 2;
-      
       lastChunkRect = chunkRect;
       // Clear visible chunks
       $scope.visibleChunks = [];
+      neededChunks = [];
       for (var di=0; di <= chunkRect.wid; di++) {
         for (var dj=0; dj < chunkRect.hei; dj++) {
           var ckey = [chunkRect.x + di, chunkRect.y + dj];
-          if (!knownChunks[ckey]) {
-            var chunk = {
-              x0: (chunkRect.x + di) * CHUNK_STEP,
-              y0: (chunkRect.y + dj) * CHUNK_STEP,
-              left: (CELL_WID * CHUNK_STEP * (deltaX + di)),
-              top: (CELL_HEI * CHUNK_STEP * (deltaY + dj)),
-              cells: [],
-            };
-            for (var dx=0; dx < CHUNK_STEP; dx++) {
-              for (var dy=0; dy < CHUNK_STEP; dy++) {
-                var x = chunk.x0 + dx;
-                var y = chunk.y0 + dy;
-                var left = chunk.left + CELL_WID * dx;
-                var top  = chunk.top  + CELL_HEI * dy + 10*(x % 2);
-                //For cheap hexagonal: + 10*(x % 2);
-                var cell = {
-                  x: x,
-                  y: y,
-                  altitude:    sWorldModel.altitude(x, y),
-                  population:  sWorldModel.population(x, y),
-                  temperature: sWorldModel.temperature(x, y),
-                  humidity:    sWorldModel.humidity(x, y),
-                  style: {
-                    "left": left + "px",
-                    "top" : top + "px",
-                  },
-                };
-                chunk.cells.push(cell);
-              }
-            }
-            knownChunks[ckey] = chunk;
-          }
-          $scope.visibleChunks.push(knownChunks[ckey]);
+          if (knownChunks[ckey]) {
+            $scope.visibleChunks.push(knownChunks[ckey]);
+          } else {
+            neededChunks.push({i: chunkRect.x + di, j: chunkRect.y + dj});
+          } 
         }
       }
     }
+    
+    function checkNeededChunks() {
+      if (neededChunks.length) {
+        var next = neededChunks.shift()
+        var chunk = makeChunk(next.i, next.j);
+        var ckey = [next.i, next.j];
+        knownChunks[ckey] = chunk;
+        $scope.$apply(function() {
+          $scope.visibleChunks.push(chunk);
+        });
+      }
+    }
+    setInterval(checkNeededChunks, 200);
     
     function getChunkRect() {
       var visible = getVisiblePixelRect()
@@ -175,7 +189,7 @@ angular.module('infiniworld')
         var deltaY = -CHUNK_STEP * firstChunkRect.y;
         
         var left = (x + deltaX) * CELL_WID;
-        var top  = (y + deltaY) * CELL_HEI;
+        var top  = (y + deltaY) * CELL_HEI + 10*(x % 2);
         $scope.selectedstyle = {
           'left': left + "px",
           'top': top + "px",
