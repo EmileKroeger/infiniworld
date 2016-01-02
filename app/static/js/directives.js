@@ -3,16 +3,14 @@ angular.module('infiniworld')
     var controller = function($scope, sBiomes, sCities, sNations) {
       var refresh = function() {
         $scope.biome = sBiomes.getBiome($scope.cell);
+        $scope.city = null;
+        $scope.nation = null;
         if ($scope.biome == "city") {
           $scope.city = sCities.getDetailed($scope.world, $scope.pos);
-          $scope.nation = sNations.getDetailed($scope.world, $scope.city.nation);
-          //$scope.nationdesc = sCities.getNationDesc($scope.city.nation);
-          //$scope.nationfeatures = sCities.getNationFeatures($scope.city.nation);
-        } else {
-          $scope.city = null;
-          $scope.nation = null;
-          //$scope.nationdesc = null;
-          //$scope.nationfeatures = [];
+          var basicNation = $scope.city.nation;
+          if (basicNation) {
+            $scope.nation = sNations.getDetailed(basicNation);
+          }
         }
       };
       $scope.$watch("pos", function() {

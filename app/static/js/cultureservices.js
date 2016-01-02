@@ -247,7 +247,7 @@ angular.module('infiniworld')
   }
 })
 .service("sNations", function(sCultures, sFeatures) {
-  this.getDetailed = function(world, basicNation) {
+  this.getDetailed = function(basicNation) {
     var pos = {x: basicNation.i, y: basicNation.j};
     return {
       blurb: sFeatures.get(sFeatures.NATIONBLURB, pos),
@@ -275,7 +275,6 @@ angular.module('infiniworld')
       city.race = sCultures.getRace(pos);
       city.description = city.nation.getCityDescription(pos.x, pos.y); 
       city.ruler = sFeatures.get(sFeatures.CITYRULER, pos);
-      //city.ruler = city.nation.getRulerDescription(pos.x, pos.y); 
       var features = sStringGen.fantasyregion(key);
       city.features = features.split("<li>");
       city.factions = sCultures.getCityFactions(pos)
