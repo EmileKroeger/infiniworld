@@ -224,28 +224,47 @@ angular.module('infiniworld')
     return sStringGen.townname(key);
   });
 
+  this.CITYBASICNATION = makeFeature(123, function(pos, key) {
+    return sCultures.getNation(pos);
+  });
+
   this.CITYRULER = makeFeature(119, function(pos, key) {
     var nation = sCultures.getNation(pos);
     return nation.getRulerDescription(pos.x, pos.y); 
   });
+  
+  this.CITYRACE = makeFeature(143, function(pos, key) {
+    return sCultures.getRace(pos);
+  });
+  
+  this.CITYBLURB = makeFeature(147, function(pos, key) {
+    var nation = sCultures.getNation(pos);
+    return nation.getCityDescription(pos.x, pos.y);
+  });
 
+  this.CITYFEATURES = makeFeature(149, function(pos, key) {
+    return sStringGen.fantasyregion(key).split("<li>");
+  });
+
+  this.CITYFACTIONS = makeFeature(151, function(pos, key) {
+    return sCultures.getCityFactions(pos);
+  });
 })
 .service("sNations", function(sCultures, sFeatures) {
   this.getDetailed = function(basicNation) {
     var pos = {x: basicNation.i, y: basicNation.j};
-    var nation = angular.extend({}, basicNation);
-    nation.blurb = sFeatures.NATIONBLURB(pos);
-    nation.features = sFeatures.NATIONFEATURES(pos);
-    return nation;
+    return angular.extend({
+      blurb:    sFeatures.NATIONBLURB(pos),
+      features: sFeatures.NATIONFEATURES(pos),
+    }, basicNation);
   };
 })
 .service("sCities", function(sField, sStringGen, sCultures, sFeatures) {
-  var keyField = sField.simpleMap(117);
   var knownCities = {};
   // Used for world map
   this.getBasic = function(world, pos) {
     return {
-      nation: sCultures.getNation(pos),
+      nation: sFeatures.CITYBASICNATION(pos),
       name: sFeatures.CITYNAME(pos),
     };
   };
@@ -253,16 +272,13 @@ angular.module('infiniworld')
   this.getDetailed = function(world, pos) {
     var posv = [pos.x, pos.y];
     if (!knownCities[posv]) {
-      var key = keyField(pos.x, pos.y);
-      // Shallow copy
-      var city = angular.extend({}, this.getBasic(world, pos));
-      city.race = sCultures.getRace(pos);
-      city.blurb = city.nation.getCityDescription(pos.x, pos.y); 
-      city.ruler = sFeatures.CITYRULER(pos);
-      var features = sStringGen.fantasyregion(key);
-      city.features = features.split("<li>");
-      city.factions = sCultures.getCityFactions(pos)
-      knownCities[posv] = city;
+      knownCities[posv] = angular.extend({
+        race:     sFeatures.CITYRACE(pos),
+        blurb:    sFeatures.CITYBLURB(pos),
+        ruler:    sFeatures.CITYRULER(pos),
+        features: sFeatures.CITYFEATURES(pos),
+        factions: sFeatures.CITYFACTIONS(pos),
+      }, this.getBasic(world, pos));
     }
     return knownCities[posv];
   };
