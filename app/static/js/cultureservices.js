@@ -182,7 +182,7 @@ angular.module('infiniworld')
   
   this.getNation = function(pos) {
     return this.getMostInfluent(pos, "nation");
-    // If no nation, it'll be a city-state.
+    // If no nation, it'll be a city-state (nothing handles that yet)
   };
   this.getRace = function(pos) {
     return this.getMostInfluent(pos, "race");
@@ -205,7 +205,14 @@ angular.module('infiniworld')
 .service("sCities", function(sField, sStringGen, sCultures) {
   var keyField = sField.simpleMap(117);
   var knownCities = {}
-  this.get = function(world, pos) {
+  this.getBasic = function(world, pos) {
+    var key = keyField(pos.x, pos.y);
+    return {
+      nation: sCultures.getNation(pos),
+      name: sStringGen.townname(key),
+    };
+  }
+  this.getDetailed = function(world, pos) {
     var posv = [pos.x, pos.y];
     if (!knownCities[posv]) {
       var key = keyField(pos.x, pos.y);

@@ -4,7 +4,7 @@ angular.module('infiniworld')
       var refresh = function() {
         $scope.biome = sBiomes.getBiome($scope.cell);
         if ($scope.biome == "city") {
-          $scope.city = sCities.get($scope.world, $scope.pos);
+          $scope.city = sCities.getDetailed($scope.world, $scope.pos);
           $scope.nationdesc = sCities.getNationDesc($scope.city.nation);
           $scope.nationfeatures = sCities.getNationFeatures($scope.city.nation);
         } else {
@@ -137,7 +137,7 @@ angular.module('infiniworld')
           if ($scope.world && $scope.pos) {
             // Actually we use this as a cheapo way of knowing whether we
             // need a city.
-            $scope.city = sCities.get($scope.world, $scope.pos);
+            $scope.city = sCities.getBasic($scope.world, $scope.pos);
           }
           if (cell.population > 0.98) {
             glyph = "♚";

@@ -4,23 +4,26 @@ angular.module('infiniworld')
   self = this;
   this.pick = function pick(list, key) {
     return list[Math.floor((key % 1) * list.length)];
-  }
+  };
   this.flip = function pick(list, key) {
     return (key % 1) < 0.5;
-  }
+  };
+  // Helper function for recursively replacing from a dictionary.
   this.build = function build(dic, name, key) {
     var result = self.pick(dic[name], key);
     result = result.replace(KEYWORD_RE, function(m, w) {
       key = (key + 0.3) * 11;
       return self.build(dic, w, key);
-    })
+    });
     return result;
+  };
+  this.hash = function(a, b) {
+    var result = ((a << 5) - a) + b;
+    return result |= 0; // Convert to 32bit integer
   }
 })
 .service("sField", function() {
   var zDistrib = gaussian(0, 1);
-  //var sample = zDistrib.ppf(Math.random());
-  //console.log(sample);
   var seed = 1;
   function random() {
       var x = Math.sin(seed++) * 10000;
@@ -35,6 +38,7 @@ angular.module('infiniworld')
 		  return seedrand(seed * 29 + x * 999 + y * 77777 + 13 * x * y + 119 * seed * (x + y));
 		};
 	};
+  // This assumes square tiling. We want hexagonal...
   this.neighbourMap = function(submap, delta) {
     var stdv = Math.sqrt(delta * delta);
 		return function(x, y) {
@@ -49,6 +53,7 @@ angular.module('infiniworld')
 		  return zDistrib.cdf(sum / stdv);
 		};
   };
+  // This will need some work to work with hexagons...
   this.lattitudeOnly = function(seed) {
     return function(x, y) {
 		  return seedrand(seed * 13 + y * 421 + 719 * seed * y);
@@ -74,6 +79,7 @@ angular.module('infiniworld')
       return zDistrib.cdf(sum / stdv);
     }
   };
+  // assumes square tiling, but we can be hexagonal
   this.peakFilter = function(field, dist) {
     return function(x, y) {
       var value = field(x, y);
