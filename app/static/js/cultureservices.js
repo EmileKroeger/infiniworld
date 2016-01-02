@@ -125,6 +125,16 @@ angular.module('infiniworld')
     }
   });
 
+
+  // Nation Features
+  this.NATIONBLURB = makeFeature(811, function(nationpos, key) {
+    return sStringGen.getNationDesc(key);
+  });
+
+  this.NATIONFEATURES = makeFeature(201, function(nationpos, key) {
+    return sStringGen.getNationFeatures(key);
+  });
+
   var RACES = [
     "Human", "Human", "Human", "Elf", "Elf", "Dwarf",
     "Orc", "Goblin"];
@@ -136,23 +146,31 @@ angular.module('infiniworld')
   this.CULTURECONSPIRACY = makeFeature(87, function(culturePos, key) {
     return sStringGen.faction(key);
   });
-
-  
-  this.makeNation = function(culturePos) {
-    var kind = this.NATIONKIND(culturePos);
-    var basename = this.NATIONBASENAME(culturePos);
+})
+.service("sNations", function(sCultureFeatures) {
+  this.getBasic = function(culturePos) {
+    var kind = sCultureFeatures.NATIONKIND(culturePos);
+    var basename = sCultureFeatures.NATIONBASENAME(culturePos);
     return {
       i: culturePos.x,
       j: culturePos.y,
       kind: kind,
       basename: basename,
       name: kind + " of " + basename,
-      maincolor: this.NATIONMAINCOLOR(culturePos),
-      colors: this.NATIONCOLORS(culturePos),
+      maincolor: sCultureFeatures.NATIONMAINCOLOR(culturePos),
+      colors: sCultureFeatures.NATIONCOLORS(culturePos),
     };
   };
+  this.getDetailed = function(basicNation) {
+    var nationPos = {x: basicNation.i, y: basicNation.j};
+    return angular.extend({
+      blurb:    sCultureFeatures.NATIONBLURB(nationPos),
+      features: sCultureFeatures.NATIONFEATURES(nationPos),
+    }, basicNation);
+  };
 })
-.service("sCultures", function(sField, sStringGen, sRandomUtils, sCultureFeatures) {
+.service("sCultures", function(sField, sStringGen, sRandomUtils,
+  sCultureFeatures, sNations) {
   // This service maps culture-space to cell-space
   var influenceKeyField = sField.simpleMap(43);
   var INFLUENCE_RANGE = 2;
@@ -162,7 +180,7 @@ angular.module('infiniworld')
     var key = influenceKeyField(i, j);
     if (key > 0.8) {
       // Nation! For now, simple.
-      culture["nation"] = sCultureFeatures.makeNation(culturePos);
+      culture["nation"] = sNations.getBasic(culturePos);
       if (key > 0.85) {
         culture["race"] = sCultureFeatures.CULTURERACE(culturePos);
       }
@@ -232,15 +250,6 @@ angular.module('infiniworld')
       return getter(pos, field(pos.x, pos.y));
     }
   }
-
-  // Nation Features
-  this.NATIONBLURB = makeFeature(811, function(pos, key) {
-    return sStringGen.getNationDesc(key);
-  });
-
-  this.NATIONFEATURES = makeFeature(201, function(pos, key) {
-    return sStringGen.getNationFeatures(key);
-  });
   
   // City Features
   this.CITYNAME = makeFeature(117, function(pos, key) {
@@ -272,15 +281,6 @@ angular.module('infiniworld')
   this.CITYFACTIONS = makeFeature(151, function(pos, key) {
     return sCultures.getCityFactions(pos);
   });
-})
-.service("sNations", function(sFeatures) {
-  this.getDetailed = function(basicNation) {
-    var pos = {x: basicNation.i, y: basicNation.j};
-    return angular.extend({
-      blurb:    sFeatures.NATIONBLURB(pos),
-      features: sFeatures.NATIONFEATURES(pos),
-    }, basicNation);
-  };
 })
 .service("sCities", function(sFeatures) {
   var knownCities = {};
