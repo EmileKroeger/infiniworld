@@ -40,6 +40,8 @@ angular.module('infiniworld')
   function ($scope, $routeParams, sWorldModel, sStringGen, sScrollControl, $window) {
     var x0 = parseInt($routeParams.x);
     var y0 = parseInt($routeParams.y);
+    $scope.world = sWorldModel;
+    $scope.scroll = sScrollControl;
     $scope.loaded = false;
     sStringGen.load(function() {
       $scope.loaded = true;
@@ -169,15 +171,6 @@ angular.module('infiniworld')
       }
     });
 
-    // Probably not needed...
-    $scope.range = function(min, max, step) {
-        step = step || 1;
-        var input = [];
-        for (var i = min; i <= max; i += step) {
-            input.push(i);
-        }
-        return input;
-    };
     // Cell selection handling
     $scope.selectedPos = {'x': x0, 'y': y0};
     $scope.selectedstyle = {visibility: "hidden"};
@@ -188,7 +181,7 @@ angular.module('infiniworld')
         var deltaX = -CHUNK_STEP * (firstChunkRect.x + 1); //magic number
         var deltaY = -CHUNK_STEP * firstChunkRect.y;
         
-        var left = (x + deltaX) * CELL_WID;
+        var left = (x + deltaX) * CELL_WID - 5;
         var top  = (y + deltaY) * CELL_HEI + 10*(x % 2);
         $scope.selectedstyle = {
           'left': left + "px",
@@ -196,53 +189,4 @@ angular.module('infiniworld')
         };
       }
     };
-    
-    $scope.world = sWorldModel;
-    
-    $scope.scroll = sScrollControl;
-    
-
-    // OLd buttons for navigation
-    $scope.moveMap = function(dx, dy) {
-      $scope.x0 += dx;
-      $scope.y0 += dy;
-      $routeParams.x += dx;
-    }
-    
-    var delta = 4;
-    $scope.navarrows = [
-      [
-        {chr: 'ℝ', dx: -delta, dy: -delta},
-        {chr: '℞', dx: 0,      dy: -delta},
-        {chr: '℟', dx: delta,  dy: -delta},
-      ], 
-      [
-        {chr: 'ℛ', dx: -delta,  dy: 0},
-        {chr: '@', dx: 0,       dy: 0},
-        {chr: '™', dx: delta,   dy: 0},
-      ], 
-      [
-        {chr: 'ℜ', dx: -delta, dy: delta},
-        {chr: '℡', dx: 0,      dy: delta},
-        {chr: '℠', dx: delta,  dy: delta},
-      ], 
-    ];
-    
-    function evaluateDistrib(func) {
-      var values = {};
-      for (var y=0; y < 11; y++) {
-        for (var x = 0; x < 20; x++) {
-          var alt = func(x, y);
-          var bin = Math.floor(10*alt);
-          if (values[bin] == undefined) {
-            values[bin] = 0;
-          }
-          values[bin] += 1;
-        }
-      }
-      for (var bin = 0; bin < 11; bin++) {
-        console.log([bin, values[bin]]);
-      }
-    }
-    //evaluateDistrib(world.humidity);
   }]);
