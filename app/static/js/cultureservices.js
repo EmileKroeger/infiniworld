@@ -47,7 +47,15 @@ angular.module('infiniworld')
     return this.generate("splats", "main", key);
   };
 })
-.service("sCultures", function(sField, sStringGen, sRandomUtils) {
+.service("sBasicFeatures", function(sField, sStringGen, sRandomUtils) {
+  function makeFeature(featureId, getter) {
+    var field = sField.simpleMap(featureId);
+    return function(pos) {
+      return getter(pos, field(pos.x, pos.y));
+    }
+  }
+  
+  // DATA, to isolate
   var NATIONKINDS = [
     "Kingdom", "Kingdom", "Empire", "Republic",
     "Kingdom", "Kingdom", "Empire", "Republic",
@@ -67,9 +75,6 @@ angular.module('infiniworld')
     "Confederacy": ["a prince", "a council of nobles", "an archbishop"],
     "Grand-duchy": ["a magistrate", "a mayor"]
   };
-  var RACES = [
-    "Human", "Human", "Human", "Elf", "Elf", "Dwarf",
-    "Orc", "Goblin"];
   var COLOR_PAIRS = [
     ["red", "white"],
     ["red", "yellow"],
@@ -95,12 +100,13 @@ angular.module('infiniworld')
     "linear-gradient(to bottom, COLA, COLA 50%, COLB 50%, COLB)",
     "linear-gradient(to right, COLA, COLA 33%, COLB 33%, COLB 67%, COLA 67%, COLA)",
   ];
-  var keyField = sField.simpleMap(43);
-  var raceKeyField = sField.simpleMap(87);
+
+
+  // First isolate, then refactor.
   var kindKeyField = sField.simpleMap(711);
   var nameKeyField = sField.simpleMap(817);
   var colorKeyField = sField.simpleMap(17);
-  var INFLUENCE_RANGE = 2;
+
   this.getMainColor = function(key) {
     // Must be same logic as below!
     return sRandomUtils.pick(COLOR_PAIRS, key * 2)[0];
@@ -135,12 +141,20 @@ angular.module('infiniworld')
       },
     };
   };
+})
+.service("sCultures", function(sField, sStringGen, sRandomUtils, sBasicFeatures) {
+  var RACES = [
+    "Human", "Human", "Human", "Elf", "Elf", "Dwarf",
+    "Orc", "Goblin"];
+  var keyField = sField.simpleMap(43);
+  var raceKeyField = sField.simpleMap(87);
+  var INFLUENCE_RANGE = 2;
   this.getCulture = sField.memoize(function(i, j) {
     var culture = {};
     var key = keyField(i, j);
     if (key > 0.8) {
       // Nation! For now, simple.
-      culture["nation"] = this.makeNation(i, j);
+      culture["nation"] = sBasicFeatures.makeNation(i, j);
       if (key > 0.85) {
         culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j));
       }
@@ -165,7 +179,7 @@ angular.module('infiniworld')
     }
   }
   this.getMostInfluent = function(pos, attribute) {
-    var closestIDist = 100000000;
+    var closestIDist = -1;
     var mostInfluent = null;
     this.forEachCulture(pos, function(culture, dist2) {
       if (culture[attribute]) {
@@ -250,7 +264,7 @@ angular.module('infiniworld')
     return sCultures.getCityFactions(pos);
   });
 })
-.service("sNations", function(sCultures, sFeatures) {
+.service("sNations", function(sFeatures) {
   this.getDetailed = function(basicNation) {
     var pos = {x: basicNation.i, y: basicNation.j};
     return angular.extend({
@@ -259,7 +273,7 @@ angular.module('infiniworld')
     }, basicNation);
   };
 })
-.service("sCities", function(sField, sStringGen, sCultures, sFeatures) {
+.service("sCities", function(sFeatures) {
   var knownCities = {};
   // Used for world map
   this.getBasic = function(world, pos) {
