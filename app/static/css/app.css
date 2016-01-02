@@ -70,6 +70,7 @@ body {
 /* Generic map elements */
 
 .surfacecell {
+  position: absolute;
   padding: 0;
   margin: 0;
   border: 0;

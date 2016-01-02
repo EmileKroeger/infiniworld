@@ -6,11 +6,8 @@
     <div ng-if="!city" class="infobox">
       <div infiniworld-cell
         class="col-xs-1 surfacecell"
-        style="position: absolute; right: 20px; top: 5px;"
-        altitude="world.altitude(pos.x, pos.y)"
-        population="world.population(pos.x, pos.y)"
-        temperature="world.temperature(pos.x, pos.y)"
-        humidity="world.humidity(pos.x, pos.y)"
+        style="right: 20px; top: 5px;"
+        cell="cell"
         dynamic="true"
         >
       </div>
@@ -44,11 +41,8 @@
       <!-- City icon in the corner -->
       <div infiniworld-cell
         class="col-xs-1 surfacecell"
-        style="position: absolute; right: 5px; top: 5px;"
-        altitude="world.altitude(pos.x, pos.y)"
-        population="world.population(pos.x, pos.y)"
-        temperature="world.temperature(pos.x, pos.y)"
-        humidity="world.humidity(pos.x, pos.y)"
+        style="right: 5px; top: 5px;"
+        cell="cell"
         dynamic="true"
         >
       </div>

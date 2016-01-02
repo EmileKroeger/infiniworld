@@ -91,42 +91,43 @@ angular.module('infiniworld')
     }
 
     var calculate = function($scope, sBiomes, sCities) {
-      var biome = sBiomes.getBiome($scope);
+      var biome = sBiomes.getBiome($scope.cell);
       var glyph = "??";
       var style = {};
       var overglyph = null;
       var overstyle = {};
+      var cell = $scope.cell; 
       if (biome == "sea") {
         glyph = "~";
-        var waveColor = blendrgb(DARKBLUE, BLUE, 2*$scope.altitude);
+        var waveColor = blendrgb(DARKBLUE, BLUE, 2*cell.altitude);
         style["background-color"] = "rgb(0%, 0%, 80%)";
         style["bcolor"] = waveColor;
       } else {
-        var vegColor = blend(YELLOW, GREEN, $scope.humidity);
-        var altColor = blendAbove(vegColor, GREY, 0.9, $scope.altitude)
-        var coldColor = blendBelow(altColor, WHITE, 0.3, $scope.temperature)
+        var vegColor = blend(YELLOW, GREEN, cell.humidity);
+        var altColor = blendAbove(vegColor, GREY, 0.9, cell.altitude)
+        var coldColor = blendBelow(altColor, WHITE, 0.3, cell.temperature)
         style["background-color"] = rgb(coldColor);
         if (biome == "mountain") {
-          if ($scope.population > 0.95) {
+          if (cell.population > 0.95) {
             glyph = "⚒";
           } else {
             glyph = "◭";
           }
-          var color = blendAbove(vegColor, GREY, 0.9, $scope.altitude)
+          var color = blendAbove(vegColor, GREY, 0.9, cell.altitude)
         } else if (biome == "tundra"){
           glyph = "::";
         } else if (biome == "swamp") {
-          if ($scope.temperature < 0.4) {
+          if (cell.temperature < 0.4) {
             glyph = "::";
-          } else if ($scope.temperature < 0.6) {
+          } else if (cell.temperature < 0.6) {
             glyph = "≚";
           } else {
             glyph = "⅋"; // deciduous
           }
-          var swampColor = blendAbove(coldColor, BROWN, 0.8, $scope.humidity);
+          var swampColor = blendAbove(coldColor, BROWN, 0.8, cell.humidity);
           style["background-color"] = rgb(swampColor);
         } else if (biome == "forest") {
-          if ($scope.temperature < 0.5) {
+          if (cell.temperature < 0.5) {
             glyph = "⅊"; //coniferous🌲
           } else {
             glyph = "⅋"; // deciduous
@@ -134,12 +135,14 @@ angular.module('infiniworld')
         } else if (biome == "city") {
           // Some kind of habitation
           if ($scope.world && $scope.pos) {
+            // Actually we use this as a cheapo way of knowing whether we
+            // need a city.
             $scope.city = sCities.get($scope.world, $scope.pos);
           }
-          if ($scope.population > 0.98) {
+          if (cell.population > 0.98) {
             glyph = "♚";
             overglyph = "♔";
-          } else if ($scope.population > 0.94) {
+          } else if (cell.population > 0.94) {
             glyph = "♜";
             overglyph = "♖";
           } else {
@@ -147,10 +150,10 @@ angular.module('infiniworld')
             overglyph = "♙";
           }
           // And i's temperature-dependant color
-          if ($scope.temperature > 0.7) {
+          if (cell.temperature > 0.7) {
             style["color"] = "white";
             overstyle["color"] = "blue";
-          } else if ($scope.temperature > 0.3) {
+          } else if (cell.temperature > 0.3) {
             style["color"] = "grey";
             overstyle["color"] = "black";
           } else {
@@ -172,10 +175,7 @@ angular.module('infiniworld')
       scope: {
         world: '=world',
         pos: '=pos',
-        altitude: '=altitude',
-        population: '=population',
-        temperature: '=temperature',
-        humidity: '=humidity',
+        cell: '=cell',
         dynamic: '=dynamic',
         selected: '=selected',
       },
