@@ -47,7 +47,7 @@ angular.module('infiniworld')
     return this.generate("splats", "main", key);
   };
 })
-.service("sNationFeatures", function(sField, sStringGen, sRandomUtils) {
+.service("sCultureFeatures", function(sField, sStringGen, sRandomUtils) {
   function makeFeature(featureId, getter) {
     var field = sField.simpleMap(featureId);
     return function(pos) {
@@ -124,45 +124,55 @@ angular.module('infiniworld')
       return pattern.replace(/COLA/g, colors[1]).replace(/COLB/g, colors[0]);
     }
   });
-  
-  this.makeNation = function(i, j) {
-    var pos = {x: i, y: j};
-    var kind = this.NATIONKIND(pos);
-    var basename = this.NATIONBASENAME(pos);
-    return {
-      i: i,
-      j: j,
-      kind: kind,
-      basename: basename,
-      name: kind + " of " + basename,
-      maincolor: this.NATIONMAINCOLOR(pos),
-      colors: this.NATIONCOLORS(pos),
-    };
-  };
-})
-.service("sCultures", function(sField, sStringGen, sRandomUtils, sNationFeatures) {
+
   var RACES = [
     "Human", "Human", "Human", "Elf", "Elf", "Dwarf",
     "Orc", "Goblin"];
-  var keyField = sField.simpleMap(43);
-  var raceKeyField = sField.simpleMap(87);
+
+  this.CULTURERACE = makeFeature(87, function(culturePos, key) {
+    return sRandomUtils.pick(RACES, key);
+  });
+
+  this.CULTURECONSPIRACY = makeFeature(87, function(culturePos, key) {
+    return sStringGen.faction(key);
+  });
+
+  
+  this.makeNation = function(culturePos) {
+    var kind = this.NATIONKIND(culturePos);
+    var basename = this.NATIONBASENAME(culturePos);
+    return {
+      i: culturePos.x,
+      j: culturePos.y,
+      kind: kind,
+      basename: basename,
+      name: kind + " of " + basename,
+      maincolor: this.NATIONMAINCOLOR(culturePos),
+      colors: this.NATIONCOLORS(culturePos),
+    };
+  };
+})
+.service("sCultures", function(sField, sStringGen, sRandomUtils, sCultureFeatures) {
+  // This service maps culture-space to cell-space
+  var influenceKeyField = sField.simpleMap(43);
   var INFLUENCE_RANGE = 2;
   this.getCulture = sField.memoize(function(i, j) {
     var culture = {};
-    var key = keyField(i, j);
+    var culturePos = {x: i, y: j};
+    var key = influenceKeyField(i, j);
     if (key > 0.8) {
       // Nation! For now, simple.
-      culture["nation"] = sNationFeatures.makeNation(i, j);
+      culture["nation"] = sCultureFeatures.makeNation(culturePos);
       if (key > 0.85) {
-        culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j));
+        culture["race"] = sCultureFeatures.CULTURERACE(culturePos);
       }
     }
     else if (key > 0.6) {
-      culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j));
+      culture["race"] = sCultureFeatures.CULTURERACE(culturePos);
     } else if (key > 0.5) {
-      culture["conspiracy"] = sStringGen.faction(raceKeyField(i, j));
+      culture["conspiracy"] = sCultureFeatures.CULTURECONSPIRACY(culturePos);
     }
-    // Also possible: religion, conspiracies, ancient empires
+    // Also possible: religion, ancient empires
     culture.influence = 0.1 + key;
     return culture;
   });
@@ -215,7 +225,7 @@ angular.module('infiniworld')
   }
 })
 .service("sFeatures",
- function(sField, sStringGen, sCultures, sNationFeatures, sRandomUtils) {
+ function(sField, sStringGen, sCultures, sCultureFeatures, sRandomUtils) {
   function makeFeature(featureId, getter) {
     var field = sField.simpleMap(featureId);
     return function(pos) {
@@ -243,7 +253,7 @@ angular.module('infiniworld')
 
   this.CITYRULER = makeFeature(119, function(pos, key) {
     var nation = sCultures.getNation(pos);
-    return sRandomUtils.pick(sNationFeatures.NATIONRULERS[nation.kind], key);
+    return sRandomUtils.pick(sCultureFeatures.NATIONRULERS[nation.kind], key);
   });
   
   this.CITYRACE = makeFeature(143, function(pos, key) {
@@ -252,7 +262,7 @@ angular.module('infiniworld')
   
   this.CITYBLURB = makeFeature(147, function(pos, key) {
     var nation = sCultures.getNation(pos);
-    return sRandomUtils.pick(sNationFeatures.NATIONCITIES[nation.kind], key);
+    return sRandomUtils.pick(sCultureFeatures.NATIONCITIES[nation.kind], key);
   });
 
   this.CITYFEATURES = makeFeature(149, function(pos, key) {
