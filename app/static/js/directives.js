@@ -5,8 +5,12 @@ angular.module('infiniworld')
         $scope.biome = sBiomes.getBiome($scope.cell);
         if ($scope.biome == "city") {
           $scope.city = sCities.get($scope.world, $scope.pos);
+          $scope.nationdesc = sCities.getNationDesc($scope.city.nation);
+          $scope.nationfeatures = sCities.getNationFeatures($scope.city.nation);
         } else {
           $scope.city = null;
+          $scope.nationdesc = null;
+          $scope.nationfeatures = [];
         }
       };
       $scope.$watch("pos", function() {
@@ -95,6 +99,7 @@ angular.module('infiniworld')
       if (biome == "sea") {
         glyph = "~";
         var waveColor = blendrgb(DARKBLUE, BLUE, 2*$scope.altitude);
+        style["background-color"] = "rgb(0%, 0%, 80%)";
         style["bcolor"] = waveColor;
       } else {
         var vegColor = blend(YELLOW, GREEN, $scope.humidity);
@@ -159,6 +164,7 @@ angular.module('infiniworld')
       $scope.biome = biome;
       $scope.glyph = glyph;
       $scope.style = style;
+      $scope.color = style["background-color"]
       $scope.overglyph = overglyph;
       $scope.overstyle = overstyle;
     }

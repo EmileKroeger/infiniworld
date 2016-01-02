@@ -117,7 +117,8 @@ angular.module('infiniworld')
                 var x = chunk.x0 + dx;
                 var y = chunk.y0 + dy;
                 var left = chunk.left + CELL_WID * dx;
-                var top  = chunk.top  + CELL_HEI * dy;
+                var top  = chunk.top  + CELL_HEI * dy + 10*(x % 2);
+                //For cheap hexagonal: + 10*(x % 2);
                 var cell = {
                   x: x,
                   y: y,

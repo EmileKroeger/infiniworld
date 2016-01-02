@@ -54,6 +54,13 @@ angular.module('infiniworld')
   this.fantasyregion = function(key) {
     return this.generate("fantasyregion", "main", key);
   };
+  this.getNationDesc = function(key) {
+    return this.generate("fantasyregion", "main_nation", key);
+  };
+  this.getNationFeatures = function(key) {
+    var mashed = this.generate("fantasyregion", "features_nation", key)
+    return mashed.split("<li>");
+  };
   this.faction = function(key) {
     return this.generate("splats", "main", key);
   };
@@ -131,6 +138,8 @@ angular.module('infiniworld')
     var kind = sRandomUtils.pick(NATIONKINDS, kindKeyField(i, j));
     var basename = sStringGen.townname(nameKeyField(i, j));
     return {
+      i: i,
+      j: j,
       name: kind + " of " + basename,
       maincolor: this.getMainColor(colorKeyField(i, j)),
       colors: this.makeColors(colorKeyField(i, j)),
@@ -195,10 +204,9 @@ angular.module('infiniworld')
   };
   this.getRace = function(pos) {
     return this.getMostInfluent(pos, "race");
-    // If no nation, it'll be a city-state.
   };
   this.getCityPopulation = function(pos) {
-    // TODO
+    // TODO: mention interesting groups
   };
   this.getCityFactions = function(pos) {
     // Who's up to what in a city?
@@ -236,10 +244,20 @@ angular.module('infiniworld')
     }
     return knownCities[posv];
   };
+  var destKeyField = sField.simpleMap(811);
+  var featKeyField = sField.simpleMap(201);
+  this.getNationDesc = function(nation) {
+    var key = destKeyField(nation.i, nation.j);
+    return sStringGen.getNationDesc(key);
+  };
+  this.getNationFeatures = function(nation) {
+    var key = featKeyField(nation.i, nation.j);
+    return sStringGen.getNationFeatures(key);
+  };
 })
 .service("sBiomes", function() {
   this.test = function() {
-    return "Got sBiomes..";
+    return "Got sBiomes.";
   };
   this.getBiome = function(cell) {
     if (cell.altitude < 0.5) {

@@ -256,7 +256,29 @@
     "wealthy"
   ], 
   "NationType": [
-    "[NationNotSubNationType]"
+    "alliance", 
+    "caliphate", 
+    "clan", 
+    "coalition", 
+    "commonwealth", 
+    "confederation", 
+    "country", 
+    "domain", 
+    "emirate", 
+    "empire", 
+    "federation", 
+    "khanate", 
+    "kingdom", 
+    "league", 
+    "nation", 
+    "principality", 
+    "rajahdom", 
+    "realm", 
+    "sheikdom", 
+    "sovereignty", 
+    "sultanate", 
+    "tribe", 
+    "union"
   ], 
   "Punishment": [
     "be almost nonexistent", 
@@ -336,8 +358,14 @@
   "main_old": [
     "[Display]<li>It is ruled by [Ruler].<li>[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."
   ], 
+  "main_nation": [
+    "[Display]"
+  ], 
+  "features_nation": [
+    "It is ruled by [Ruler].<li>[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."
+  ], 
   "main2": [
-    "The people of this city are [CitizenQuality]", 
+    "The people of this domain are [CitizenQuality]", 
     "This domain gives a strong sense of being [LandPersonality]", 
     "The people of this domain are [CitizenQuality].<li>This domain gives a strong sense of being [LandPersonality]"
   ]

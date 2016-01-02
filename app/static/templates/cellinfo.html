@@ -3,25 +3,63 @@
     Nothing selected
   </div>
   <div ng-if="pos">
-    &nbsp;{{biome}} ({{pos.x}}, {{pos.y}})
-    <div infiniworld-cell
-      class="col-xs-1 surfacecell"
-      altitude="world.altitude(pos.x, pos.y)"
-      population="world.population(pos.x, pos.y)"
-      temperature="world.temperature(pos.x, pos.y)"
-      humidity="world.humidity(pos.x, pos.y)"
-      dynamic="true"
-      >
+    <div ng-if="!city" class="infobox">
+      <div infiniworld-cell
+        class="col-xs-1 surfacecell"
+        style="position: absolute; right: 20px; top: 5px;"
+        altitude="world.altitude(pos.x, pos.y)"
+        population="world.population(pos.x, pos.y)"
+        temperature="world.temperature(pos.x, pos.y)"
+        humidity="world.humidity(pos.x, pos.y)"
+        dynamic="true"
+        >
+      </div>
+      {{biome}} ({{pos.x}}, {{pos.y}})
     </div>
+    
     <!--
     <br>Cell at {{cell.altitude}}
     <p>Nation colors: {{city.nation.colors}}</p>
 
       -->
+
+    <div ng-if="city && city.nation" class="infobox">
+      <h4 ng-style="{'color': city.nation.maincolor}">
+        {{city.nation.name}}
+      </h4>
+      <div
+        class="infoboxflag"
+        ng-style="{'background': city.nation.colors}"
+        >
+      </div>
+      <div>{{nationdesc}}</div>
+      <ul>
+        <li ng-repeat="feature in nationfeatures">
+          {{feature}}
+        </li>
+      </ul>
+    </div>
     
-    <div ng-if="city">
-      <h3>{{city.name}}</h3>
-      <p>In the {{city.nation.name}}</p>
+    <div ng-if="city" class="infobox">
+      <!-- City icon in the corner -->
+      <div infiniworld-cell
+        class="col-xs-1 surfacecell"
+        style="position: absolute; right: 5px; top: 5px;"
+        altitude="world.altitude(pos.x, pos.y)"
+        population="world.population(pos.x, pos.y)"
+        temperature="world.temperature(pos.x, pos.y)"
+        humidity="world.humidity(pos.x, pos.y)"
+        dynamic="true"
+        >
+      </div>
+      
+      <!-- Name -->
+      <h3>City of <span class="borderedname" ng-style="{'color': city.nation.maincolor}">
+        {{city.name}}
+      </span></h3>
+
+      <!-- Features -->
+      
       <p>{{city.description}}, ruled by {{city.ruler}}.</p>
       <ul>
         <li ng-repeat="feature in city.features">

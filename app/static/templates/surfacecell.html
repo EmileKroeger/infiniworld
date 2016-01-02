@@ -1,4 +1,8 @@
-<div ng-class="biome" ng-style="::style" style="position: relative;">
+<div class="cellleftear" ng-style="::{'border-right-color': color}">
+</div>
+<div class="cellrightear" ng-style="::{'border-left-color': color}">
+</div>
+<div ng-class="biome" ng-style="::style" class="cellmiddle">
   {{::glyph}}
   <div ng-if="::city">
     <div class="cityname" ng-style="::{'color': city.nation.maincolor}">{{::city.name}}</div>
