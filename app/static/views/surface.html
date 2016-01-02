@@ -31,14 +31,14 @@
  </div>
 
  <div ng-repeat="chunk in visibleChunks">
-  <div ng-repeat="cell in chunk.cells"
+  <div ng-repeat="cellview in chunk.cellviews"
     infiniworld-cell
     class="surfacecell"
-    ng-style="::cell.style"
-    ng-click="select(cell.x, cell.y);"
+    ng-style="::cellview.style"
+    ng-click="select(cellview.x, cellview.y);"
     world="::world"
-    cell="::cell"
-    pos="::{'x': cell.x, 'y': cell.y}"
+    cell="::cellview.cell"
+    pos="::{'x': cellview.x, 'y': cellview.y}"
     dynamic="::false"
     >
   </div>
