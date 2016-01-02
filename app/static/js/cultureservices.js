@@ -47,7 +47,7 @@ angular.module('infiniworld')
     return this.generate("splats", "main", key);
   };
 })
-.service("sBasicFeatures", function(sField, sStringGen, sRandomUtils) {
+.service("sNationFeatures", function(sField, sStringGen, sRandomUtils) {
   function makeFeature(featureId, getter) {
     var field = sField.simpleMap(featureId);
     return function(pos) {
@@ -68,6 +68,7 @@ angular.module('infiniworld')
     "Confederacy": ["A city-state"],
     "Grand-duchy": ["A baronny"]
   };
+  this.NATIONCITIES = NATIONCITIES;
   var NATIONRULERS = {
     "Kingdom": ["a baron", "a duke", "a council of nobles"],
     "Empire": ["a governor", "a consul", "a council", "a magistrate"],
@@ -75,6 +76,7 @@ angular.module('infiniworld')
     "Confederacy": ["a prince", "a council of nobles", "an archbishop"],
     "Grand-duchy": ["a magistrate", "a mayor"]
   };
+  this.NATIONRULERS = NATIONRULERS;
   var COLOR_PAIRS = [
     ["red", "white"],
     ["red", "yellow"],
@@ -101,48 +103,44 @@ angular.module('infiniworld')
     "linear-gradient(to right, COLA, COLA 33%, COLB 33%, COLB 67%, COLA 67%, COLA)",
   ];
 
-
-  // First isolate, then refactor.
-  var kindKeyField = sField.simpleMap(711);
-  var nameKeyField = sField.simpleMap(817);
-  var colorKeyField = sField.simpleMap(17);
-
-  this.getMainColor = function(key) {
-    // Must be same logic as below!
+  this.NATIONKIND = makeFeature(711, function(nationpos, key) {
+    return sRandomUtils.pick(NATIONKINDS, key);
+  });
+  
+  this.NATIONBASENAME = makeFeature(817, function(nationpos, key) {
+    return sStringGen.townname(key);
+  });
+  
+  this.NATIONMAINCOLOR = makeFeature(17, function(nationpos, key) {
     return sRandomUtils.pick(COLOR_PAIRS, key * 2)[0];
-  }
-  this.makeColors = function(key) {
+  });
+  // Same key as above!
+  this.NATIONCOLORS = makeFeature(17, function(nationpos, key) {
     var colors = sRandomUtils.pick(COLOR_PAIRS, key * 2);
     var pattern = sRandomUtils.pick(FLAG_PATTERNS, key);
-    var colA = colors[0];
-    var colB = colors[1];
     if (sRandomUtils.flip(key*38)) {
-      colA = colors[1];
-      colB = colors[0];
+      return pattern.replace(/COLA/g, colors[0]).replace(/COLB/g, colors[1]);
+    } else {
+      return pattern.replace(/COLA/g, colors[1]).replace(/COLB/g, colors[0]);
     }
-    return pattern.replace(/COLA/g, colA).replace(/COLB/g, colB);
-  };
+  });
+  
   this.makeNation = function(i, j) {
-    var kind = sRandomUtils.pick(NATIONKINDS, kindKeyField(i, j));
-    var basename = sStringGen.townname(nameKeyField(i, j));
+    var pos = {x: i, y: j};
+    var kind = this.NATIONKIND(pos);
+    var basename = this.NATIONBASENAME(pos);
     return {
       i: i,
       j: j,
+      kind: kind,
+      basename: basename,
       name: kind + " of " + basename,
-      maincolor: this.getMainColor(colorKeyField(i, j)),
-      colors: this.makeColors(colorKeyField(i, j)),
-      getCityDescription: function(x, y) {
-        var regionKind = sRandomUtils.pick(NATIONCITIES[kind],
-          nameKeyField(x, y));
-        return regionKind; // Basic, TODO: improve
-      },
-      getRulerDescription: function(x, y) {
-        return sRandomUtils.pick(NATIONRULERS[kind], nameKeyField(x, y) * 7);
-      },
+      maincolor: this.NATIONMAINCOLOR(pos),
+      colors: this.NATIONCOLORS(pos),
     };
   };
 })
-.service("sCultures", function(sField, sStringGen, sRandomUtils, sBasicFeatures) {
+.service("sCultures", function(sField, sStringGen, sRandomUtils, sNationFeatures) {
   var RACES = [
     "Human", "Human", "Human", "Elf", "Elf", "Dwarf",
     "Orc", "Goblin"];
@@ -154,7 +152,7 @@ angular.module('infiniworld')
     var key = keyField(i, j);
     if (key > 0.8) {
       // Nation! For now, simple.
-      culture["nation"] = sBasicFeatures.makeNation(i, j);
+      culture["nation"] = sNationFeatures.makeNation(i, j);
       if (key > 0.85) {
         culture["race"] = sRandomUtils.pick(RACES, raceKeyField(i, j));
       }
@@ -216,7 +214,8 @@ angular.module('infiniworld')
     return factions;
   }
 })
-.service("sFeatures", function(sField, sStringGen, sCultures) {
+.service("sFeatures",
+ function(sField, sStringGen, sCultures, sNationFeatures, sRandomUtils) {
   function makeFeature(featureId, getter) {
     var field = sField.simpleMap(featureId);
     return function(pos) {
@@ -244,7 +243,7 @@ angular.module('infiniworld')
 
   this.CITYRULER = makeFeature(119, function(pos, key) {
     var nation = sCultures.getNation(pos);
-    return nation.getRulerDescription(pos.x, pos.y); 
+    return sRandomUtils.pick(sNationFeatures.NATIONRULERS[nation.kind], key);
   });
   
   this.CITYRACE = makeFeature(143, function(pos, key) {
@@ -253,7 +252,7 @@ angular.module('infiniworld')
   
   this.CITYBLURB = makeFeature(147, function(pos, key) {
     var nation = sCultures.getNation(pos);
-    return nation.getCityDescription(pos.x, pos.y);
+    return sRandomUtils.pick(sNationFeatures.NATIONCITIES[nation.kind], key);
   });
 
   this.CITYFEATURES = makeFeature(149, function(pos, key) {

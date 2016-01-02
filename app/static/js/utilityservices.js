@@ -1,7 +1,7 @@
 angular.module('infiniworld')
 .service("sRandomUtils", function() {
   var KEYWORD_RE = /\[([\w ]+)\]/g;
-  self = this;
+  var self = this;
   this.pick = function pick(list, key) {
     return list[Math.floor((key % 1) * list.length)];
   };
