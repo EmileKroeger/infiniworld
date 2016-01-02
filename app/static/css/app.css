@@ -11,7 +11,7 @@ html, body, div {
 body {
   /*margin-top: 60px;
   padding: 10px; */
-  background-color: #ECF0F1;
+  background-color: grey;
 }
 
 @font-face {
@@ -23,8 +23,8 @@ body {
 
 .infocolumn {
   position: absolute;
-  top: 60px;
-  left: 25px;
+  top: 25px;
+  left: 15px;
   z-index: 200;
 }
 
