@@ -202,30 +202,42 @@ angular.module('infiniworld')
     return factions;
   }
 })
-.service("sCities", function(sField, sStringGen, sCultures) {
+.service("sFeatures", function(sField, sStringGen, sCultures) {
+  var getters = {};
+  this.CITYNAME = 117;
+  getters[this.CITYNAME] = function(pos, key) {
+    return sStringGen.townname(key);
+  }
+  var fieldIds = [this.CITYNAME];
+  var fields = {};
+  fieldIds.forEach(function(fieldId) {
+    fields[fieldId] = sField.simpleMap(fieldId)
+  });
+  this.get = function(fieldId, pos) {
+    // actually, if I'm just using this as a random key a hash would be 
+    // cheaper.
+    var key = fields[fieldId](pos.x, pos.y);
+    return getters[fieldId](pos, key);
+  }
+})
+.service("sCities", function(sField, sStringGen, sCultures, sFeatures) {
   var keyField = sField.simpleMap(117);
   var knownCities = {}
   this.getBasic = function(world, pos) {
-    var key = keyField(pos.x, pos.y);
     return {
       nation: sCultures.getNation(pos),
-      name: sStringGen.townname(key),
+      name: sFeatures.get(sFeatures.CITYNAME, pos),
     };
-  }
+  };
   this.getDetailed = function(world, pos) {
     var posv = [pos.x, pos.y];
     if (!knownCities[posv]) {
       var key = keyField(pos.x, pos.y);
-      var nation = sCultures.getNation(pos);
-      var city = {
-        nation: nation,
-        name: sStringGen.townname(key),
-        race: sCultures.getRace(pos),
-      };
-      // All this is not necessary for 'map' cities, could be optimized
-      // away
-      city.description = nation.getCityDescription(pos.x, pos.y); 
-      city.ruler = nation.getRulerDescription(pos.x, pos.y); 
+      // Shallow copy
+      var city = angular.extend({}, this.getBasic(world, pos));
+      city.race = sCultures.getRace(pos);
+      city.description = city.nation.getCityDescription(pos.x, pos.y); 
+      city.ruler = city.nation.getRulerDescription(pos.x, pos.y); 
       var features = sStringGen.fantasyregion(key);
       city.features = features.split("<li>");
       city.factions = sCultures.getCityFactions(pos)
