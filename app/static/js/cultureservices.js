@@ -203,56 +203,40 @@ angular.module('infiniworld')
   }
 })
 .service("sFeatures", function(sField, sStringGen, sCultures) {
-  var getters = {};
+  function makeFeature(featureId, getter) {
+    var field = sField.simpleMap(featureId);
+    return function(pos) {
+      return getter(pos, field(pos.x, pos.y));
+    }
+  }
 
-  // Features
-  this.CITYNAME = 117;
-  getters[this.CITYNAME] = function(pos, key) {
-    return sStringGen.townname(key);
-  };
-
-  this.CITYRULER = 119;
-  getters[this.CITYRULER] = function(pos, key) {
-    var nation = sCultures.getNation(pos);
-    return nation.getRulerDescription(pos.x, pos.y); 
-  };
-
-  this.NATIONBLURB = 811;
-  getters[this.NATIONBLURB] = function(pos, key) {
+  // Nation Features
+  this.NATIONBLURB = makeFeature(811, function(pos, key) {
     return sStringGen.getNationDesc(key);
-  };
+  });
 
-  this.NATIONFEATURES = 201;
-  getters[this.NATIONFEATURES] = function(pos, key) {
+  this.NATIONFEATURES = makeFeature(201, function(pos, key) {
     return sStringGen.getNationFeatures(key);
-  };
-
-  // Utility
-  var fieldIds = [this.CITYNAME, this.CITYRULER, this.NATIONBLURB,
-    this.NATIONFEATURES];
-  var fields = {};
-  fieldIds.forEach(function(fieldId) {
-    fields[fieldId] = sField.simpleMap(fieldId)
   });
   
-  // Access API
-  this.get = function(fieldId, pos) {
-    // actually, if I'm just using this as a random key a hash would be 
-    // cheaper.
-    var key = fields[fieldId](pos.x, pos.y);
-    if (!getters[fieldId]) {
-      console.debug(["ERROR", fieldId]);
-    }
-    return getters[fieldId](pos, key);
-  }
+  // City Features
+  this.CITYNAME = makeFeature(117, function(pos, key) {
+    return sStringGen.townname(key);
+  });
+
+  this.CITYRULER = makeFeature(119, function(pos, key) {
+    var nation = sCultures.getNation(pos);
+    return nation.getRulerDescription(pos.x, pos.y); 
+  });
+
 })
 .service("sNations", function(sCultures, sFeatures) {
   this.getDetailed = function(basicNation) {
     var pos = {x: basicNation.i, y: basicNation.j};
-    return {
-      blurb: sFeatures.get(sFeatures.NATIONBLURB, pos),
-      features: sFeatures.get(sFeatures.NATIONFEATURES, pos),
-    };
+    var nation = angular.extend({}, basicNation);
+    nation.blurb = sFeatures.NATIONBLURB(pos);
+    nation.features = sFeatures.NATIONFEATURES(pos);
+    return nation;
   };
 })
 .service("sCities", function(sField, sStringGen, sCultures, sFeatures) {
@@ -262,7 +246,7 @@ angular.module('infiniworld')
   this.getBasic = function(world, pos) {
     return {
       nation: sCultures.getNation(pos),
-      name: sFeatures.get(sFeatures.CITYNAME, pos),
+      name: sFeatures.CITYNAME(pos),
     };
   };
   // Used for detailed view, when selected
@@ -273,8 +257,8 @@ angular.module('infiniworld')
       // Shallow copy
       var city = angular.extend({}, this.getBasic(world, pos));
       city.race = sCultures.getRace(pos);
-      city.description = city.nation.getCityDescription(pos.x, pos.y); 
-      city.ruler = sFeatures.get(sFeatures.CITYRULER, pos);
+      city.blurb = city.nation.getCityDescription(pos.x, pos.y); 
+      city.ruler = sFeatures.CITYRULER(pos);
       var features = sStringGen.fantasyregion(key);
       city.features = features.split("<li>");
       city.factions = sCultures.getCityFactions(pos)

@@ -3,6 +3,9 @@
     Nothing selected
   </div>
   <div ng-if="pos">
+
+    <!-- Normal terrain -->
+    
     <div ng-if="!city" class="infobox">
       <div infiniworld-cell
         class="col-xs-1 surfacecell"
@@ -14,19 +17,15 @@
       {{biome}} ({{pos.x}}, {{pos.y}})
     </div>
     
-    <!--
-    <br>Cell at {{cell.altitude}}
-    <p>Nation colors: {{city.nation.colors}}</p>
-
-      -->
-
+    <!-- Nation -->
+    
     <div ng-if="nation" class="infobox">
-      <h4 ng-style="{'color': city.nation.maincolor}">
-        {{city.nation.name}}
+      <h4 ng-style="{'color': nation.maincolor}">
+        {{nation.name}}
       </h4>
       <div
         class="infoboxflag"
-        ng-style="{'background': city.nation.colors}"
+        ng-style="{'background': nation.colors}"
         >
       </div>
       <div>{{nation.blurb}}</div>
@@ -36,6 +35,8 @@
         </li>
       </ul>
     </div>
+
+    <!-- City -->
     
     <div ng-if="city" class="infobox">
       <!-- City icon in the corner -->
@@ -54,7 +55,7 @@
 
       <!-- Features -->
       
-      <p>{{city.description}}, ruled by {{city.ruler}}.</p>
+      <p>{{city.blurb}}, ruled by {{city.ruler}}.</p>
       <ul>
         <li ng-repeat="feature in city.features">
           {{feature}}
