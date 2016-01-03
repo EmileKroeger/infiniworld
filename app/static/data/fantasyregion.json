@@ -39,7 +39,7 @@
     "very xenophobic", 
     "violent"
   ], 
-  "Display": [
+  "main_nation": [
     "A [NationQuality] [NationType] [NationPlace]."
   ], 
   "LandPersonality": [
@@ -356,10 +356,7 @@
     "The people of this city are [CitizenQuality].<li>The city is famous because [CityQuality]."
   ], 
   "main_old": [
-    "[Display]<li>It is ruled by [Ruler].<li>[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."
-  ], 
-  "main_nation": [
-    "[Display]"
+    "[main_nation]<li>It is ruled by [Ruler].<li>[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."
   ], 
   "features_nation": [
     "It is ruled by [Ruler].<li>[main2].<li>This domain is famous because [LandQuality].<li>The laws of this domain are [Laws]. Punishments for misdeeds tend to [Punishment]."

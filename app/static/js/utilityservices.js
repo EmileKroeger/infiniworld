@@ -5,6 +5,21 @@ angular.module('infiniworld')
   this.pick = function pick(list, key) {
     return list[Math.floor((key % 1) * list.length)];
   };
+  this.pickTwoOrdered = function(list, key) {
+    var i1 = Math.floor((key % 1) * list.length)
+    var key2 = key * list.length;
+    var i2 = Math.floor((key2 % 1) * (list.length - 1))
+    if (i2 >= i1) {
+      // Increase so the two are different.
+      i2 += 1;
+      // THeir order is fine.
+      return [list[i1], list[i2]];
+    } else {
+      // Swap them so they stay in order.
+      return [list[i2], list[i1]];
+    }
+      
+  }
   this.flip = function pick(list, key) {
     return (key % 1) < 0.5;
   };

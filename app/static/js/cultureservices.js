@@ -39,6 +39,9 @@ angular.module('infiniworld')
   this.getNationDesc = function(key) {
     return this.generate("fantasyregion", "main_nation", key);
   };
+  this.getNationQuality = function(key) {
+    return this.generate("fantasyregion", "NationQuality", key);
+  };
   this.getNationFeatures = function(key) {
     var mashed = this.generate("fantasyregion", "features_nation", key)
     return mashed.split("<li>");
@@ -102,6 +105,8 @@ angular.module('infiniworld')
     "linear-gradient(to bottom, COLA, COLA 50%, COLB 50%, COLB)",
     "linear-gradient(to right, COLA, COLA 33%, COLB 33%, COLB 67%, COLA 67%, COLA)",
   ];
+  
+  var self = this;
 
   this.NATIONKIND = makeFeature(711, function(nationpos, key) {
     return sRandomUtils.pick(NATIONKINDS, key);
@@ -125,10 +130,11 @@ angular.module('infiniworld')
     }
   });
 
-
   // Nation Features
   this.NATIONBLURB = makeFeature(811, function(nationpos, key) {
-    return sStringGen.getNationDesc(key);
+    //return sStringGen.getNationDesc(key);
+    var quality = sStringGen.getNationQuality(key);
+    return "A " + quality + " " + self.NATIONKIND(nationpos);
   });
 
   this.NATIONFEATURES = makeFeature(201, function(nationpos, key) {
@@ -136,8 +142,9 @@ angular.module('infiniworld')
   });
 
   var RACES = [
-    "Human", "Human", "Human", "Elf", "Elf", "Dwarf",
-    "Orc", "Goblin"];
+    "Human", "Human", "Human", "Elf", "Elf",
+    "Dwarf", "Orc", "Goblin",
+  ];
 
   this.CULTURERACE = makeFeature(87, function(culturePos, key) {
     return sRandomUtils.pick(RACES, key);
@@ -227,10 +234,27 @@ angular.module('infiniworld')
   this.getRace = function(pos) {
     return this.getMostInfluent(pos, "race");
   };
-  this.getCityPopulation = function(pos) {
-    // TODO: mention interesting groups
-  };
-  this.getCityFactions = function(pos) {
+
+  DENIZENKINDS = [
+    "Mystical religious order",
+    "School of magic",
+    "Refugees from a great war",
+    "A secret assassin",
+    "The royal inquisitors",
+    "Ambassadors from a nearby nation",
+  ]
+  
+  
+  WORSHIP_TARGET = ["the holy rabbit"
+  ]
+  WORSHIPPERS = [
+    "A large congregation of worshippers of X",
+    "Newly anointed disciples of X on their pilgrimage",
+    "A holy man of X",
+    "Heretics, denying the truth of X",
+  ]
+
+  this.getCityDenizens = function(pos) {
     // Who's up to what in a city?
     var factions = []
     this.forEachCulture(pos, function(culture, dist2) {
@@ -278,8 +302,32 @@ angular.module('infiniworld')
     return sStringGen.fantasyregion(key).split("<li>");
   });
 
-  this.CITYFACTIONS = makeFeature(151, function(pos, key) {
-    return sCultures.getCityFactions(pos);
+  var MAINOCCUPATIONS = ["nobles", "landowners", "soldiers", "scribes", 
+    "merchants", "craftsmen", "fishermen", "slaves",
+  ];
+
+  this.CITYPOPULATION = makeFeature(153, function(pos, key) {
+    // pick two, in order
+    var occupations = sRandomUtils.pickTwoOrdered(MAINOCCUPATIONS, key);
+    return occupations.join(" and ");
+  });
+  
+  var STANDARDDENIZENS = [
+    "Beggars, hanging around the market place",
+    "Pilgrims, on their way to see a holy place",
+    "Dancers, preparing for a holy festival",
+    "Adventurers, looking for trouble",
+    "Knights, training outside the gates",
+    "Thieves, lurking in the shadows",
+    "A storyteller, recalling old legends",
+    "Mercenaries, on a secret mission",
+  ]
+  DENIZENS = ["pilgrims", "beggars"]
+
+  this.CITYDENIZENS = makeFeature(151, function(pos, key) {
+    var factions = sCultures.getCityDenizens(pos);
+    factions.unshift(sRandomUtils.pick(STANDARDDENIZENS, key));
+    return factions;
   });
 })
 .service("sCities", function(sFeatures) {
@@ -296,11 +344,12 @@ angular.module('infiniworld')
     var posv = [pos.x, pos.y];
     if (!knownCities[posv]) {
       knownCities[posv] = angular.extend({
-        race:     sFeatures.CITYRACE(pos),
+        //race:     sFeatures.CITYRACE(pos),
         blurb:    sFeatures.CITYBLURB(pos),
         ruler:    sFeatures.CITYRULER(pos),
         features: sFeatures.CITYFEATURES(pos),
-        factions: sFeatures.CITYFACTIONS(pos),
+        population: sFeatures.CITYPOPULATION(pos),
+        denizens: sFeatures.CITYDENIZENS(pos),
       }, this.getBasic(world, pos));
     }
     return knownCities[posv];

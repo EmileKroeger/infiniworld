@@ -55,24 +55,27 @@
 
       <!-- Features -->
       
-      <p>{{city.blurb}}, ruled by {{city.ruler}}.</p>
+      <p>{{city.blurb}}, ruled by {{city.ruler}}. It is famous for:</p>
       <ul>
         <li ng-repeat="feature in city.features">
           {{feature}}
         </li>
       </ul>
+      <p>
+        The city is mostly peopled by {{city.population}}, but you may also meet:
+      <p>
+      <ul>
+        <li ng-repeat="denizen in city.denizens">
+          {{denizen}}
+        </li>
+      </ul>
+
+      <!--
       <p>Population</p>
       <ul>
         <li>{{city.race}}</li>
       </ul>
-      <div ng-if="city.factions.length">
-        Factions:
-        <ul>
-        <li ng-repeat="faction in city.factions">
-          {{faction}}
-        </li>
-      </ul>
-      </div>
+        -->
     </div>
   </div>
 </div>
