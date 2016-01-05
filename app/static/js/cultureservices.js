@@ -153,6 +153,58 @@ angular.module('infiniworld')
   this.CULTURECONSPIRACY = makeFeature(87, function(culturePos, key) {
     return sStringGen.faction(key);
   });
+
+
+ var WORSHIP_ADJ = ["Ebon", "Burning", "Holy", "Glorious", "Dark", "Bloody",
+   "Mystic", "Seventh", "Third", "Safron", "Triple", "Nine-fold",
+   "True", "Noble", "Perfect", "First", "Primal", "Shadow", "Second", 
+   "Fourth", "Fifth", "Seventh", "Eight", "Ninth", "Tenth", "Twelfth",
+   "Untold", "Scarlet", "Crimson", "Vigilant", "Ancient", "Astral", 
+   "Black", "Bleeding", "Blessed", "Brazen", "Celestial", "Divine", 
+   "Elder", "Enchanted", "Endless", "Enduring", "Eternal", "Fiery",
+   "Final", "Forbidden", "Fogotten", "Forsaken", "Golden", "Silver",
+   "Hallowed", "Heavenly", "Hidden", "Immortal", "Inner", "Iron", "Ivory",
+   "Last", "Lost", "Ineffable", "Naked", "Dark", "Perfect", "Promised",
+   "Sacred", "Sleeping", "Stolen", "Sublime", "Supreme", "Ultimate",
+   "Undying", "Unseen", "Veiled", "White", "Grey", "Wild", "Seven-fold",
+   "Three-fold", "Eight-fold",
+]
+ 
+ var WORSHIP_NOUN = ["Lady", "Hand", "Fire", "Lord", "Goddess", "Mystery",
+   "Church", "Dawn", "Grove", "Triad", "Truth", "Age", "Ark", "Blade",
+   "Cowl", "Chalice", "Circle", "Dream", "Beast", "Shadow", "Riddle",
+   "Form", "Heart", "Eye", "Key", "Kingdom", "Law", "Testament", 
+   "Commandment", "Doctrine", "Book", "Verse", "Word", "Maiden", "Virgin",
+   "Moon", "Morning", "Path", "Gate", "Power", "Rite", "Sigil", "Snake",
+   "Sphere", "Star", "Stone", "Sword", "Teaching", "Temple", "Way", "Crown",
+   "Cross", "Chaos", "Darkness", "Love", "Spring", "Wing", "Face", "Gem",
+   "God", "Secret",
+ ]
+ WORSHIP_DENIZENS = [
+   "A large congregation of worshippers of [WORSHIPOBJECT]",
+   "A few worshippers of [WORSHIPOBJECT]",
+   "Scattered and dispirited worshippers of [WORSHIPOBJECT]",
+   "Enthusiastic new followers of [WORSHIPOBJECT]",
+   "Newly anointed disciples of [WORSHIPOBJECT] on their pilgrimage",
+   "Priests of [WORSHIPOBJECT], staying away from the things of the world",
+   "A holy man, manifesting the virtue of [WORSHIPOBJECT]",
+   "A bearded mystic, speaking riddles about [WORSHIPOBJECT]",
+   "Heretics, expelled for their blasphemous conception of [WORSHIPOBJECT]",
+   "A preacher, spreading the truth of [WORSHIPOBJECT]",
+   "Preachers of [WORSHIPOBJECT], mocked by the crowd",
+   "Wild-eyed men in rags, speaking in hushed tones of the glory of [WORSHIPOBJECT]",
+   "Secret adorers of [WORSHIPOBJECT], meeting at night",
+   "Veiled figures, carrying a holy relic of [WORSHIPOBJECT]",
+ ]
+ this.WORSHIP_DENIZENS = WORSHIP_DENIZENS;
+
+  
+  this.CULTUREWORSHIPOBJECT = makeFeature(91, function(culturePos, key) {
+    var adjective =  sRandomUtils.pick(WORSHIP_ADJ, key);
+    key = key * WORSHIP_ADJ.length;
+    var noun = sRandomUtils.pick(WORSHIP_NOUN, key);
+    return "the " + adjective + " " + noun; 
+  });
 })
 .service("sNations", function(sCultureFeatures) {
   this.getBasic = function(culturePos) {
@@ -196,6 +248,10 @@ angular.module('infiniworld')
       culture["race"] = sCultureFeatures.CULTURERACE(culturePos);
     } else if (key > 0.5) {
       culture["conspiracy"] = sCultureFeatures.CULTURECONSPIRACY(culturePos);
+    } else if (key > 0.455) {
+      culture["worship"] = {
+        object: sCultureFeatures.CULTUREWORSHIPOBJECT(culturePos),
+      }
     }
     // Also possible: religion, ancient empires
     culture.influence = 0.1 + key;
@@ -243,24 +299,23 @@ angular.module('infiniworld')
     "The royal inquisitors",
     "Ambassadors from a nearby nation",
   ]
-  
-  
-  WORSHIP_TARGET = ["the holy rabbit"
-  ]
-  WORSHIPPERS = [
-    "A large congregation of worshippers of X",
-    "Newly anointed disciples of X on their pilgrimage",
-    "A holy man of X",
-    "Heretics, denying the truth of X",
-  ]
+ var worshipKeyField = sField.simpleMap(119);
 
   this.getCityDenizens = function(pos) {
     // Who's up to what in a city?
-    var factions = []
+    var factions = [];
+    var key = worshipKeyField(pos.x, pos.y);
     this.forEachCulture(pos, function(culture, dist2) {
       // TODO: maybe sort/vary according to influence?
       if (culture.conspiracy) {
-        factions.push(culture.conspiracy)
+        //factions.push(culture.conspiracy);
+      }
+      else if (culture.worship) {
+        // I could possibly allow one positive and up to two negative...
+        var phrase = sRandomUtils.pick(sCultureFeatures.WORSHIP_DENIZENS, key);
+        phrase = phrase.replace("[WORSHIPOBJECT]", culture.worship.object);
+        factions.push(phrase);
+        key = key * sCultureFeatures.WORSHIP_DENIZENS.length;
       }
     });
     return factions;

@@ -82,6 +82,38 @@ angular.module('infiniworld')
       return chunk;
     }
     
+    function iterFromInside(low, high, callback) {
+      // return all values starting from the middle.
+      var mid = Math.floor((high + low) * 0.5);
+      var delta = Math.max(high - mid, mid - low);
+      callback(mid);
+      for (var di = 1; di <= delta; di++) {
+        if (mid - di >= low) {
+          callback(mid - di);
+        }
+        if (mid + di < high) {
+          callback(mid + di);
+        }
+      }
+    }
+    
+    function iterSpiral(wid, hei, callback) {
+      //Naive version -  I could make a much better spiral :)
+      iterFromInside(0, wid, function(x) {
+        iterFromInside(0, hei, function(y) {
+          callback(x, y);
+        });
+      });
+    } 
+    
+    function iterGrid(wid, hei, callback) {
+      for (var x=0; x < wid; x++) {
+        for (var y=0; y < hei; y++) {
+          callback(x, y);
+        }
+      }
+    }
+    
     var firstChunkRect = null;
     var lastChunkRect = null;
     function updateVisibleChunks(chunkRect) {
@@ -92,16 +124,14 @@ angular.module('infiniworld')
       // Clear visible chunks
       $scope.visibleChunks = [];
       neededChunks = [];
-      for (var di=0; di <= chunkRect.wid; di++) {
-        for (var dj=0; dj < chunkRect.hei; dj++) {
-          var ckey = [chunkRect.x + di, chunkRect.y + dj];
-          if (knownChunks[ckey]) {
-            $scope.visibleChunks.push(knownChunks[ckey]);
-          } else {
-            neededChunks.push({i: chunkRect.x + di, j: chunkRect.y + dj});
-          } 
-        }
-      }
+      iterSpiral(chunkRect.wid, chunkRect.hei, function(di, dj){
+        var ckey = [chunkRect.x + di, chunkRect.y + dj];
+        if (knownChunks[ckey]) {
+          $scope.visibleChunks.push(knownChunks[ckey]);
+        } else {
+          neededChunks.push({i: chunkRect.x + di, j: chunkRect.y + dj});
+        } 
+      });
     }
     
     function checkNeededChunks() {
@@ -120,6 +150,11 @@ angular.module('infiniworld')
     function getChunkRect() {
       var visible = getVisiblePixelRect()
       var rect = getContainingRect(visible, CELL_WID * CHUNK_STEP);
+      // TODO: figure out why my calculations are wrong, and fix them
+      // instead of patching'em post-hoc.
+      rect.y -= 1;
+      rect.hei += 0;
+      rect.wid += 1;
       return rect;
     }
     
