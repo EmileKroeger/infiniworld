@@ -19,6 +19,20 @@ body {
     src: url("Symbola.ttf");
 }
 
+
+/* Home */
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.welcomepage {
+  background-color: white;
+  height: 80%;
+}
+
+
 /* Page-level elements */
 
 .infocolumn {
@@ -49,10 +63,18 @@ body {
   top: 5px;
 }
 
-
-.navarrow {
-  font-family: Symbola;
+.linkhome {
+  z-index: 500;
+  position: fixed;
+  background-color: black;
+  color: grey;
+  width: 20px;
+  text-align: center;
 }
+.linkhome > a {
+  color: grey;
+}
+
 
 .mapframe {
   position: relative;

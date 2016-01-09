@@ -1,29 +1,16 @@
-
-<div style="position: fixed">
-    <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-8 col-centered welcomepage">
             <h1>Welcome to InfiniWorld!</h1>
-            <p class="lead">Editor home</p>
+            <p>InfiniWorld is a procedurally generated map that can be scrolled (nearly) infinitely in all directions.</p>
+            
+            <p>It's mostly an opportunity for me to play around with algorithms that create an interesting world.</p>
 
             <p>
-	            <a href="#/x/0/y/0/">Start here</a>
+	            <a class="btn btn-success" href="#/x/0/y/0/">Start exploring!</a>
             </p>
-        </div>
-    </div>
-</div>
-
-        <div style="width: 100%; height: 100%; border: 2px solid red;"
-        class="mapframe" 
-        ng-style="{'cursor': scroll.dragging ? 'grabbing' : 'grab'}"
-        ng-mousedown="scroll.handleMouseDown($event);"
-        ng-mousemove="scroll.handleMouseMove($event);"
-        ng-mouseup="scroll.handleMouseUp($event);"
-        >
-          <div class="scrollablemap" ng-style="{'left': scroll.left+'px', top: scroll.top+'px'}">
-            <div ng-repeat="y in testrange">
-              <div ng-repeat="x in testrange" style="width: 100px; height: 100px; position: absolute; text-align: center; vertical-align: middle; line-height: 100px;" ng-style="{'background-color': getColor(x, y), 'left': 100*x+'px', top: 100*y+'px'}">
-                ({{x}}, {{y}})
-              </div>
-            </div>
-          </div>
+            
+            <p>For more information:</p>
+            <ul>
+              <li><a href="https://github.com/EmileKroeger/infiniworld/">Sources on Github</a></li>
+              <li>My Blog, <a href="https://themadmapmaker.wordpress.com/">The Mad Mapmaker</a></li>
+            </ul>
         </div>
