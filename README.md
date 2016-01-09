@@ -13,6 +13,6 @@ Other Data used:
 
  * Some text extracted from Abulafia (http://random-generator.com)
  * The "Symbola" font
- 
- My blog: https://themadmapmaker.wordpress.com/ - you may find more information on the project there.
+
+My blog: https://themadmapmaker.wordpress.com/ - you may find more information on the project there.
  
