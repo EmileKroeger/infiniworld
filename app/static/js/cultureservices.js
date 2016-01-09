@@ -50,7 +50,27 @@ angular.module('infiniworld')
     return this.generate("splats", "main", key);
   };
 })
-.service("sCultureFeatures", function(sField, sStringGen, sRandomUtils) {
+.service("sGeometry", function() {
+  // So, I'm getting an int32
+  var N = 2 << 15;
+  var MASK = N - 1;
+  function mod(x,  m) {
+      return ((x % m) + m) % m;
+  }
+  
+  this.encode = function(x, y) {
+    return (mod(x, N) << 15) + mod(y, N);
+  };
+  this.getx = function(poscode) {
+    // Bigger digits are x
+    return poscode >> 15;
+  };
+  this.gety = function(poscode) {
+    //smaller digits are y
+    return poscode & MASK;
+  };
+})
+.service("sCultureFeatures", function(sField, sStringGen, sRandomUtils, sGeometry) {
   function makeFeature(featureId, getter) {
     var field = sField.simpleMap(featureId);
     return function(pos) {
@@ -292,7 +312,7 @@ angular.module('infiniworld')
   };
 
   DENIZENKINDS = [
-    "Mystical religious order",
+    // "Mystical religious order",
     "School of magic",
     "Refugees from a great war",
     "A secret assassin",
@@ -377,7 +397,6 @@ angular.module('infiniworld')
     "A storyteller, recalling old legends",
     "Mercenaries, on a secret mission",
   ]
-  DENIZENS = ["pilgrims", "beggars"]
 
   this.CITYDENIZENS = makeFeature(151, function(pos, key) {
     var factions = sCultures.getCityDenizens(pos);
