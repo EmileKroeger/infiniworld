@@ -36,6 +36,16 @@
  </div>
 
  <div ng-repeat="chunk in visibleChunks">
+   
+ <!-- Debug info for chunk loading
+  <div
+    style = "z-index: 500; position: absolute; background-color: grey;"
+    ng-style="{'left': chunk.left, 'top': chunk.top}"
+  >
+    {{chunk.x0 / 8}}<br>{{chunk.y0 / 8}}
+  </div>
+   -->
+   
   <div ng-repeat="cellview in chunk.cellviews"
     infiniworld-cell
     class="surfacecell"

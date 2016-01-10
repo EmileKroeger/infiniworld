@@ -59,8 +59,9 @@ angular.module('infiniworld')
       var chunk = {
         x0: i * CHUNK_STEP,
         y0: j * CHUNK_STEP,
+        // TODO: make this code more explicit
         left: (CELL_WID * CHUNK_STEP * (i - firstChunkRect.x - 1)),
-        top: (CELL_HEI * CHUNK_STEP * (j - firstChunkRect.y)),
+        top: (CELL_HEI * CHUNK_STEP * (j - firstChunkRect.y - 1)),
         cellviews: [],
       };
       for (var dx=0; dx < CHUNK_STEP; dx++) {
@@ -155,9 +156,8 @@ angular.module('infiniworld')
       var rect = getContainingRect(visible, CELL_WID * CHUNK_STEP);
       // TODO: figure out why my calculations are wrong, and fix them
       // instead of patching'em post-hoc.
-      rect.y -= 1;
-      rect.hei += 0;
-      rect.wid += 1;
+      rect.hei += 2;
+      rect.wid += 2;
       return rect;
     }
     
@@ -177,7 +177,7 @@ angular.module('infiniworld')
       if (firstChunkRect) {
         
         var deltaX = -CHUNK_STEP * (firstChunkRect.x + 1); //magic number
-        var deltaY = -CHUNK_STEP * firstChunkRect.y;
+        var deltaY = -CHUNK_STEP * (firstChunkRect.y + 1);
         
         var left = (x + deltaX) * CELL_WID - 5;
         var top  = (y + deltaY) * CELL_HEI + 10*(x % 2);
