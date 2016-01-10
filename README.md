@@ -2,17 +2,12 @@ InfiniWorld, an infinite procedural map in JavaScript.
 
 See live: http://mremile.pythonanywhere.com/
 
-Some Technologies used:
-
- * Flask (though as of January 2016 all the code is client-side)
- * Angular JS
- * Bootstrap
- * Yeoman
+This project is built using Yeoman (http://yeoman.io/) and the angular-flask Generator (https://github.com/rayokota/generator-angular-flask) - though as of January 2016 all the important code is client-side (flask is not used, only static content is).
  
-Other Data used:
+Other ressources used:
 
  * Some text extracted from Abulafia (http://random-generator.com)
- * The "Symbola" font
+ * The "Symbola" font (from https://zhm.github.io/symbola/)
 
-My blog: https://themadmapmaker.wordpress.com/ - you may find more information on the project there.
+You may find more information on the project on my blog: https://themadmapmaker.wordpress.com/.
  
