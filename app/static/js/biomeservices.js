@@ -1,5 +1,5 @@
 angular.module('infiniworld')
-.service("sWorldModel", function(sField) {
+.service("sWorldModel", function(sField, sDebugParams) {
   var memoize = sField.memoize;
   var simpleMap = sField.simpleMap;
   var neighbourMap = sField.neighbourMap;
@@ -18,6 +18,9 @@ angular.module('infiniworld')
   population0 = simpleMap(57);
   population1 = sField.cutIfBelow(population0, this.altitude, 0.5);
 	this.population = sField.peakFilter(population0, 2);
+  if (sDebugParams.noCities) {
+    this.population = function(i, j) {return 0;}
+  }
   
   var knownCells = {};
   

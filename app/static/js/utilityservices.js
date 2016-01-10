@@ -128,3 +128,10 @@ angular.module('infiniworld')
  }
 	return this;
 })
+.service("sDebugParams", function($location) {
+  this.noCities = false;
+  if ($location.search().nocities == "1") {
+    console.log("Debug mode: noCities");
+    this.noCities = true;
+  }
+})

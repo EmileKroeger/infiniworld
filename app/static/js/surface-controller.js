@@ -1,6 +1,9 @@
 angular.module('infiniworld')
-  .controller('SurfaceController', ['$scope', '$routeParams', 'sWorldModel', 'sStringGen', 'sScrollControl', '$window',
-  function ($scope, $routeParams, sWorldModel, sStringGen, sScrollControl, $window) {
+  .controller('SurfaceController',
+  ['$scope', '$routeParams', 'sWorldModel', 'sStringGen', 'sScrollControl',
+    '$window', 'sDebugParams',
+  function ($scope, $routeParams, sWorldModel, sStringGen, sScrollControl,
+     $window, sDebugParams) {
     var x0 = parseInt($routeParams.x);
     var y0 = parseInt($routeParams.y);
     $scope.world = sWorldModel;
